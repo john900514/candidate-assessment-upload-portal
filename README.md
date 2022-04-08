@@ -1,29 +1,48 @@
-# README #
+# ![Laravel Example App](logo.jpeg)
 
-This README would normally document whatever steps are necessary to get your application up and running.
 
-### What is this repository for? ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+> ### Portal Dev
 
-### How do I get set up? ###
+The cake is usually the truth when you buy it from the store and it's sitting on your counter waiting for you to sink the knife into it while thinking about how GlaDOS was a gd liar.
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+----------
+# Getting started
 
-### Contribution guidelines ###
+## Installation
 
-* Writing tests
-* Code review
-* Other guidelines
+Clone the repository
 
-### Who do I talk to? ###
+    You should have downloaded this app with the installer tool.
 
-* Repo owner or admin
-* Other community or team contact
+Switch to the repo folder
+
+    cd dev/capeandbay/assessment_dev
+
+Install all the PHP dependencies using composer
+
+    composer install
+
+Install all the JS dependencies using npm
+
+    npm install && npm run dev
+
+Copy the example env file and make the required configuration changes in the .env file
+
+    cp .env.example .env
+
+Generate a new application key
+
+    php artisan key:generate
+
+Run the database migrations (**Set the database connection in .env before migrating**)
+
+    php artisan migrate
+
+Start the local development server
+
+    php artisan serve
+
+You should now be able to access the server at http://localhost:8000
+
+
