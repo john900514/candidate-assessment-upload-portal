@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers\Admin\Users;
 
-use App\Http\Requests\UserManagementRequest;
+use App\Actions\Users\Query\GetAllCandidateUUIDs;
+use App\Actions\Users\Query\GetAllEmployeeUUIDs;
+use App\Actions\Users\Query\GetAllUserUUIDs;
+use App\Aggregates\Users\UserAggregate;
+use App\Http\Requests\Users\UserManagementRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -42,15 +46,18 @@ class UserManagementCrudController extends CrudController
         $user = backpack_user();
         if($user->can('view_employees') && $user->can('view_candidates'))
         {
-            //$this->crudAddClause()
+            $user_uuids = GetAllUserUUIDs::run();
+            $this->crud->addClause('whereIn', 'id', $user_uuids);
         }
         else if($user->can('view_employees'))
         {
-
+            $user_uuids = GetAllEmployeeUUIDs::run();
+            $this->crud->addClause('whereIn', 'id', $user_uuids);
         }
         else if($user->can('view_candidates'))
         {
-
+            $user_uuids = GetAllCandidateUUIDs::run();
+            $this->crud->addClause('whereIn', 'id', $user_uuids);
         }
         else
         {
@@ -67,7 +74,18 @@ class UserManagementCrudController extends CrudController
             $this->crud->denyAccess('update');
         }
 
-        CRUD::setFromDb(); // columns
+        CRUD::column('email')->type('text');
+        CRUD::column('employee_status')->type('closure')
+            ->function(function($entry) {
+                return $entry->employee_status->value;
+            });
+
+        CRUD::column('role')->type('closure')
+            ->function(function($entry) {
+                return $entry->getRoles()[0];
+            });
+
+        CRUD::column('email_verified_at')->label('Active')->type('boolean');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -103,6 +121,31 @@ class UserManagementCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-        $this->setupCreateOperation();
+        $entry = $this->crud->getCurrentEntry();
+        //dd($entry->toArray());
+        $status = $entry->employee_status()->first();
+
+        if($status->value == 'employee')
+        {
+            if(backpack_user()->can('edit_users'))
+            {
+                CRUD::field('first_name');
+
+            }
+            else
+            {
+                $this->crud->hasAccessOrFail('nope');
+            }
+        }
+        elseif(backpack_user()->can('create_candidates'))
+        {
+            $this->crud->field('first_name')->attributes(['disabled' => 'disabled']);
+            $this->crud->field('last_name')->attributes(['disabled' => 'disabled']);
+            $this->crud->field('email')->attributes(['disabled' => 'disabled']);
+        }
+        else
+        {
+            $this->crud->hasAccessOrFail('nope');
+        }
     }
 }

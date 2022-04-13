@@ -59,4 +59,9 @@ class User extends Authenticatable
     {
         return $this->detail()->where('name', '=', 'api-token');
     }
+
+    public function employee_status()
+    {
+        return $this->detail()->where('name', '=', 'employee_status');
+    }
 }

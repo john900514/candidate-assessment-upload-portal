@@ -6,6 +6,7 @@ use App\Aggregates\Users\Partials\AccessTokenPartial;
 use App\Aggregates\Users\Partials\CandidateProfilePartial;
 use App\Aggregates\Users\Partials\EmployeeProfilePartial;
 use App\Exceptions\Users\UserAuthException;
+use App\StorableEvents\Users\ApplicantCreated;
 use App\StorableEvents\Users\UserCreated;
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
 
@@ -38,7 +39,15 @@ class UserAggregate extends AggregateRoot
             throw UserAuthException::userAlreadyExists($details['email']);
         }
 
-        $this->recordThat(new UserCreated($this->uuid(), $details, $role));
+        if($role == 'applicant')
+        {
+            $this->recordThat(new ApplicantCreated($this->uuid(), $details, $role));
+        }
+        else
+        {
+            $this->recordThat(new UserCreated($this->uuid(), $details, $role));
+        }
+
 
         return $this;
     }
@@ -52,5 +61,10 @@ class UserAggregate extends AggregateRoot
     public function getAccessToken() : string | false
     {
         return $this->access_token->getAccessToken();
+    }
+
+    public function getRole() : string | null
+    {
+        return $this->role;
     }
 }
