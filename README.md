@@ -13,11 +13,11 @@ The cake is usually the truth when you buy it from the store and it's sitting on
 
 Clone the repository
 
-    You should have downloaded this app with the installer tool.
+    git clone git@bitbucket.org:capeandbaytrufit/candidate-assessment-upload-portal.git.
 
 Switch to the repo folder
 
-    cd dev/capeandbay/assessment_dev
+    cd dev/capeandbay/portal_dev
 
 Install all the PHP dependencies using composer
 

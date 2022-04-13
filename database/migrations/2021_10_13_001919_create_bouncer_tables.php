@@ -19,10 +19,10 @@ class CreateBouncerTables extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('title')->nullable();
-            $table->bigInteger('entity_id')->unsigned()->nullable();
+            $table->uuid('entity_id')->nullable();
             $table->string('entity_type')->nullable();
             $table->boolean('only_owned')->default(false);
-            $table->json('options')->nullable();
+            $table->longText('options')->nullable();
             $table->uuid('scope')->nullable()->index();
             $table->timestamps();
         });
@@ -33,7 +33,6 @@ class CreateBouncerTables extends Migration
             $table->string('title')->nullable();
             $table->integer('level')->unsigned()->nullable();
             $table->uuid('scope')->nullable()->index();
-            $table->integer('group')->unsigned()->index();
             $table->timestamps();
 
             $table->unique(
@@ -45,9 +44,9 @@ class CreateBouncerTables extends Migration
         Schema::create(Models::table('assigned_roles'), function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('role_id')->unsigned()->index();
-            $table->bigInteger('entity_id')->unsigned();
+            $table->uuid('entity_id');
             $table->string('entity_type');
-            $table->bigInteger('restricted_to_id')->unsigned()->nullable();
+            $table->uuid('restricted_to_id')->nullable();
             $table->string('restricted_to_type')->nullable();
             $table->uuid('scope')->nullable()->index();
 
@@ -64,7 +63,7 @@ class CreateBouncerTables extends Migration
         Schema::create(Models::table('permissions'), function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('ability_id')->unsigned()->index();
-            $table->bigInteger('entity_id')->unsigned()->nullable();
+            $table->uuid('entity_id')->nullable();
             $table->string('entity_type')->nullable();
             $table->boolean('forbidden')->default(false);
             $table->uuid('scope')->nullable()->index();
