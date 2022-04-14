@@ -41,6 +41,16 @@ class DashboardController extends Controller
                         'class' => 'bg-info',
                         'wrapper' => ['class' => 'col-6']
 
+                    ],
+                    [
+                        'type'        => 'card',
+                        'content' => [
+                            'header' => $aggy->getFirstName()."'s Open Positions",
+                            'body' => view('card-bodies.applicants-open-positions')->render()
+                        ],
+                        'class' => 'bg-success',
+                        'wrapper' => ['class' => 'col-6']
+
                     ]
                 ]
             ];

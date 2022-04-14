@@ -105,4 +105,9 @@ class JobPositionAggregate extends AggregateRoot
     {
         return $this->description;
     }
+
+    public function getJobTitle() : string | null
+    {
+        return $this->job_title;
+    }
 }

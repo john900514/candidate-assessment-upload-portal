@@ -12,10 +12,10 @@ class CandidateProfilePartial extends AggregatePartial
 {
     protected string $candidate_status = 'unqualified-candidate';
     protected array $open_job_positions = [];
+    protected bool $has_submitted_resume = false;
 
     public function applyUserCreated(UserCreated $event)
     {
-
         switch($event->role)
         {
             case 'FE_CANDIDATE':
