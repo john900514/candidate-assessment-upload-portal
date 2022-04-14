@@ -7,6 +7,7 @@ use App\Aggregates\Users\Partials\CandidateProfilePartial;
 use App\Aggregates\Users\Partials\EmployeeProfilePartial;
 use App\Exceptions\Users\UserAuthException;
 use App\StorableEvents\Users\ApplicantCreated;
+use App\StorableEvents\Users\Applicants\ApplicantRoleChanged;
 use App\StorableEvents\Users\UserCreated;
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
 
@@ -29,6 +30,11 @@ class UserAggregate extends AggregateRoot
     public function applyUserCreated(UserCreated $event)
     {
         $this->email = $event->details['email'];
+        $this->role  = $event->role;
+    }
+
+    public function applyApplicantRoleChanged(ApplicantRoleChanged $event)
+    {
         $this->role  = $event->role;
     }
 
@@ -58,6 +64,18 @@ class UserAggregate extends AggregateRoot
         return $this;
     }
 
+    public function updateCandidateRole(string $role) : self
+    {
+        $this->candidate_profile->updateCandidateRole($role);
+        return $this;
+    }
+
+    public function updateCandidatesAvailablePositions(array $positions) : self
+    {
+        $this->candidate_profile->updateCandidatesAvailablePositions($positions);
+        return $this;
+    }
+
     public function getAccessToken() : string | false
     {
         return $this->access_token->getAccessToken();
@@ -66,5 +84,20 @@ class UserAggregate extends AggregateRoot
     public function getRole() : string | null
     {
         return $this->role;
+    }
+
+    public function getOpenJobPositions() : array
+    {
+        return $this->candidate_profile->getOpenJobPositions();
+    }
+
+    public function isApplicant()
+    {
+        return $this->candidate_profile->getCandidateStatus() != 'non-candidate';
+    }
+
+    public function isEmployee()
+    {
+        return $this->employee_profile->getEmployeeStatus() == 'employee';
     }
 }

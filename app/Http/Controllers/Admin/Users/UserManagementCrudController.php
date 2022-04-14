@@ -7,6 +7,7 @@ use App\Actions\Users\Query\GetAllEmployeeUUIDs;
 use App\Actions\Users\Query\GetAllUserUUIDs;
 use App\Aggregates\Users\UserAggregate;
 use App\Http\Requests\Users\UserManagementRequest;
+use App\Models\Candidates\JobPosition;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -19,7 +20,7 @@ class UserManagementCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation  { update as traitUpdate; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
@@ -122,8 +123,8 @@ class UserManagementCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $entry = $this->crud->getCurrentEntry();
-        //dd($entry->toArray());
         $status = $entry->employee_status()->first();
+        $aggy = UserAggregate::retrieve($entry->id);
 
         if($status->value == 'employee')
         {
@@ -139,13 +140,86 @@ class UserManagementCrudController extends CrudController
         }
         elseif(backpack_user()->can('create_candidates'))
         {
-            $this->crud->field('first_name')->attributes(['disabled' => 'disabled']);
-            $this->crud->field('last_name')->attributes(['disabled' => 'disabled']);
+            $this->crud->field('first_name')->attributes(['disabled' => 'disabled'])->wrapper(['class' => 'col-6']);
+            $this->crud->field('last_name')->attributes(['disabled' => 'disabled'])->wrapper(['class' => 'col-6']);
             $this->crud->field('email')->attributes(['disabled' => 'disabled']);
+
+            $roles = [
+                'FE_CANDIDATE'   => 'Frontend Applicant',
+                'BE_CANDIDATE'   => 'Backend Candidate',
+                'FS_CANDIDATE'   => 'FullStack Candidate',
+                'MGNT_CANDIDATE' => 'Management Candidate',
+                'APPLICANT'      => 'Unqualified Applicant'
+            ];
+
+            $this->crud->field('role')->type('select_from_array')
+                ->options($roles)->value(strtoupper($entry->getRoles()[0]));
+
+            // @todo - get data recall on this.
+            $this->crud->addField([
+                'label' => 'Link Job Position(s) to Applicant',
+                'type' => 'select_multiple',
+                'name' => 'positions',
+                'model' => JobPosition::class,
+                'attribute' => 'job_title',
+                'options'   => (function ($query) {
+                    return $query->where('active', 1)->get();
+                }),
+                'value' => $aggy->getOpenJobPositions()
+            ]);
         }
-        else
+    else
         {
             $this->crud->hasAccessOrFail('nope');
         }
+    }
+
+    public function update()
+    {
+        $data = request()->all();
+        $aggy = UserAggregate::retrieve($data['id']);
+
+        switch($aggy->getRole())
+        {
+            case 'applicant':
+            case 'APPLICANT':
+            case 'fe_candidate':
+            case 'FE_CANDIATE':
+            case 'be_candidate':
+            case 'BE_CANDIDATE':
+            case 'fs_candidate':
+            case 'FS_CANDIDATE':
+            case 'mgnt_candidate':
+            case 'MGNT_CANDIDATE':
+
+            if(!is_null($data['positions']))
+                {
+                    // @todo - unqualified candidate cannot be linked to a job position
+                    if(($data['role'] == 'APPLICANT') && (count($data['positions']) > 0))
+                    {
+                        \Alert::add('warning','Qualify an Applicant to Link them to open positions')->flash();
+                        $this->crud->setSaveAction();
+                        return redirect()->back();
+                    }
+                    // @todo - chosen position must match the level of the Job Position
+                    $aggy->updateCandidateRole($data['role'])
+                        ->updateCandidatesAvailablePositions($data['positions'])
+                        ->persist();
+
+                    \Alert::add('success','Applicant Updated!')->flash();
+
+                }
+                else
+                {
+                    \Alert::add('error','Job Positions Required')->flash();
+                    return redirect()->back();
+                }
+            break;
+
+            default:
+        }
+
+        $this->crud->setSaveAction();
+        return $this->crud->performSaveAction($data['id']);
     }
 }

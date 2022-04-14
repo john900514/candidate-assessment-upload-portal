@@ -5,6 +5,8 @@ namespace App\Projectors\Users;
 use App\Models\User;
 use App\Models\UserDetails;
 use App\StorableEvents\Users\ApplicantCreated;
+use App\StorableEvents\Users\Applicants\ApplicantLinkedToJobPosition;
+use App\StorableEvents\Users\Applicants\ApplicantRoleChanged;
 use App\StorableEvents\Users\UserCreated;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 use Spatie\EventSourcing\EventHandlers\Projectors\Projector;
@@ -45,6 +47,28 @@ class UserAuthProjector extends Projector
         $employee->save();
 
         Bouncer::assign($event->role)->to($user);
+    }
+
+    public function onApplicantRoleChanged(ApplicantRoleChanged $event)
+    {
+        $user = User::find($event->user_id);
+        $current_role = $user->getRoles()[0];
+        Bouncer::retract($current_role)->from($user);
+        Bouncer::assign($event->role)->to($user);
+    }
+
+    public function onApplicantLinkedToJobPosition(ApplicantLinkedToJobPosition $event)
+    {
+        $user = User::find($event->user_id);
+        $detail = UserDetails::firstOrCreate([
+            'user_id' => $user->id,
+            'name' => 'available_positions',
+            'active' => 1
+        ]);
+
+        $detail->value = true;
+        $detail->misc = $event->job_positions;
+        $detail->save();
     }
 
     public function onAccessTokenGranted(AccessTokenGranted $event)

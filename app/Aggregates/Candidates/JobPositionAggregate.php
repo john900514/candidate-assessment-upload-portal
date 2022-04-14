@@ -3,7 +3,10 @@
 namespace App\Aggregates\Candidates;
 
 use App\Exceptions\Candidates\JobPositionException;
+use App\StorableEvents\Candidates\AssessmentsAddedOrUpdatedToJobPosition;
+use App\StorableEvents\Candidates\JobDescription;
 use App\StorableEvents\Candidates\JobPositionCreated;
+use App\StorableEvents\Candidates\JobPositionUpdated;
 use App\StorableEvents\Candidates\QualifiedRoleAdded;
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
 
@@ -21,13 +24,31 @@ class JobPositionAggregate extends AggregateRoot
     public function applyJobPositionCreated(JobPositionCreated $event)
     {
         $this->job_title = $event->config['position'];
-        $this->job_type = $event->config['concentration']->value;
-        $this->awarded_role = $event->config['awarded_role']->value;
+        $this->job_type = $event->config['concentration']['value'];
+        $this->awarded_role = $event->config['awarded_role']['value'];
     }
 
     public function applyQualifiedRoleAdded(QualifiedRoleAdded $event)
     {
         $this->qualified_roles[] = $event->role;
+    }
+
+    public function applyJobPositionUpdated(JobPositionUpdated $event)
+    {
+        $this->job_title = $event->config['position'];
+        $this->job_type = $event->config['concentration']['value'];
+        $this->awarded_role = $event->config['awarded_role']['value'];
+        $this->active = $event->config['active'];
+    }
+
+    public function applyAssessmentsAddedOrUpdatedToJobPosition(AssessmentsAddedOrUpdatedToJobPosition $event)
+    {
+        $this->assessments = $event->assessments;
+    }
+
+    public function applyJobDescription(JobDescription $event)
+    {
+        $this->description = $event->desc;
     }
 
     public function createJobPosition(array $config) : self
@@ -55,5 +76,33 @@ class JobPositionAggregate extends AggregateRoot
         $this->recordThat(new QualifiedRoleAdded($this->uuid(), $pending_role));
 
         return $this;
+    }
+
+    public function updateJobPosition(array $config) : self
+    {
+        $this->recordThat(new JobPositionUpdated($this->uuid(), $config));
+        return $this;
+    }
+
+    public function updateAssessments(array $assessments) : self
+    {
+        $this->recordThat(new AssessmentsAddedOrUpdatedToJobPosition($this->uuid(), $assessments));
+        return $this;
+    }
+
+    public function updateDescription(string $desc) : self
+    {
+        $this->recordThat(new JobDescription($this->uuid(), $desc));
+        return $this;
+    }
+
+    public function getAssessments() : array
+    {
+        return $this->assessments;
+    }
+
+    public function getDesc() : string | null
+    {
+        return $this->description;
     }
 }

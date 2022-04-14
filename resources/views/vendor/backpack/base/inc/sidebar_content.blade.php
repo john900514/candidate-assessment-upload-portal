@@ -12,3 +12,11 @@
 @if(backpack_user()->can('create_job_positions'))
     <li class='nav-item'><a class='nav-link' href='{{ backpack_url('candidates/job-positions') }}'><i class='nav-icon las la-chalkboard-teacher'></i>Job Positions</a></li>
 @endif
+
+@if(backpack_user()->can('create_assessments'))
+    <li class='nav-item'><a class='nav-link' href='{{ backpack_url('candidates/assessments') }}'><i class='nav-icon las la-chalkboard-teacher'></i>Assessments</a></li>
+@endif
+
+@if(backpack_user()->can('create_quiz_questions'))
+    <li class='nav-item'><a class='nav-link' href='{{ backpack_url('assets/source-code') }}'><i class="las la-laptop-code"></i> Source Code</a></li>
+@endif

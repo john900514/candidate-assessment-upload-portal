@@ -64,4 +64,9 @@ class User extends Authenticatable
     {
         return $this->detail()->where('name', '=', 'employee_status');
     }
+
+    public function available_positions()
+    {
+        return $this->detail()->where('name', '=', 'available_positions');
+    }
 }

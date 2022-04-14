@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Aggregates\Users\UserAggregate;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -24,9 +25,25 @@ class DashboardController extends Controller
             trans('backpack::base.dashboard') => false,
         ];
 
-        if(false)
-        {
+        $aggy = UserAggregate::retrieve(backpack_user()->id);
 
+
+        if($aggy->isApplicant())
+        {
+            $this->data['widgets'] = [
+                'before_content' => [
+                    [
+                        'type'        => 'card',
+                        'content' => [
+                            'header' => 'Download the Installer',
+                            'body' => view('card-bodies.download-the-installer')->render()
+                        ],
+                        'class' => 'bg-info',
+                        'wrapper' => ['class' => 'col-6']
+
+                    ]
+                ]
+            ];
         }
         else
         {

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Admin\Candidates;
 
+use App\Aggregates\Candidates\JobPositionAggregate;
 use App\Enums\JobTypeEnum;
+use App\Enums\SecurityGroupEnum;
 use App\Enums\UserRoleEnum;
-use App\Http\Requests\JobPositionRequest;
+use App\Http\Requests\Candidates\JobPositionRequest;
+use App\Models\Candidates\Assessment;
+use App\Models\Candidates\Tests\Quiz;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -17,7 +21,7 @@ class JobPositionCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation  { update as traitUpdate; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
@@ -67,7 +71,6 @@ class JobPositionCrudController extends CrudController
     {
         CRUD::setValidation(JobPositionRequest::class);
 
-        CRUD::setFromDb(); // fields
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
@@ -84,6 +87,94 @@ class JobPositionCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-        $this->setupCreateOperation();
+        $aggy = JobPositionAggregate::retrieve($this->crud->getCurrentEntryId());
+        $this->crud->field('job_title')->attributes(['required' => 'required'])
+            ->wrapper(['class' => 'col-6']);
+
+        $job_types = [];
+        foreach(collect(JobTypeEnum::cases()) as $enum)
+        {
+            $job_types[$enum->value] = $enum->name;
+        }
+
+        $this->crud->field('concentration')->type('select_from_array')
+            ->options($job_types)->wrapper(['class' => 'col-6']);
+
+        $this->crud->field('description')->type('textarea')
+            ->value($aggy->getDesc() ?? '');
+
+        $roles = [];
+        foreach(collect(UserRoleEnum::cases()) as $enum)
+        {
+            $roles[$enum->value] = $enum->name;
+        }
+        $this->crud->field('awarded_role')->attributes(['required' => 'required'])
+            ->type('select_from_array')->options($roles)
+            ->wrapper(['class' => 'col-12']);
+
+        $this->crud->field('assessments')->type('select_multiple')
+            ->attributes(['required' => 'required'])->label('Add or Remove Assessments')
+            ->model(Assessment::class)->attribute('assessment_name')
+            ->options(function ($query) {
+                return $query->where('active', 1)->get();
+            })->value($aggy->getAssessments());
+
+        $this->crud->field('active')->type('boolean')
+            ->hint('Assessments must be added before Activating');
+
+    }
+
+    public function update()
+    {
+        $data = request()->all();
+        $aggy = JobPositionAggregate::retrieve($data['id']);
+
+        if(!array_key_exists('active', $data) || (!$data['active'] ?? false))
+        {
+
+            $payload = [
+                'position' => $data['job_title'],
+                'concentration' => ['value' => $data['concentration']],
+                'awarded_role' => ['value' => $data['awarded_role']],
+                'active' => 0
+            ];
+            $aggy = $aggy->updateJobPosition($payload);
+
+            if($data['description'] ?? null)
+            {
+                $aggy = $aggy->updateDescription($data['description']);
+            }
+
+            $aggy->persist();
+        }
+        else
+        {
+            if(!is_null($data['assessments']))
+            {
+                $payload = [
+                    'position' => $data['job_title'],
+                    'concentration' => ['value' => $data['concentration']],
+                    'awarded_role' => ['value' => $data['awarded_role']],
+                    'active' => 1
+                ];
+                $aggy = $aggy->updateJobPosition($payload)
+                    ->updateAssessments($data['assessments']);
+
+                if($data['description'] ?? null)
+                {
+                    $aggy = $aggy->updateDescription($data['description']);
+                }
+
+                $aggy->persist();
+            }
+            else
+            {
+                \Alert::add('error','Assessments Required')->flash();
+                return redirect()->back();
+            }
+        }
+
+        $this->crud->setSaveAction();
+        return $this->crud->performSaveAction($this->crud->getCurrentEntryId());
     }
 }

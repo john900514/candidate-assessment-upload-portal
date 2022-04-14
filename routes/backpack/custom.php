@@ -16,6 +16,7 @@ Route::group([
     'namespace'  => 'App\Actions',
 ], function () { // custom admin routes
     Route::post('edit-account-info/access-token', 'Users\Auth\AccessToken')->name('backpack.account.access-token');
+    Route::post('assets/download-installer', 'Assets\DownloadInstallerAction')->name('download-installer');
 });
 
 Route::group([
@@ -41,4 +42,6 @@ Route::group([
 ], function () { // custom admin routes
     Route::crud('users', 'Users\UserManagementCrudController');
     Route::crud('candidates/job-positions', 'Candidates\JobPositionCrudController');
+    Route::crud('candidates/assessments', 'Candidates\AssessmentCrudController');
+    Route::crud('assets/source-code', 'Assets\SourceCodeCrudController');
 });// this should be the absolute last line of this file

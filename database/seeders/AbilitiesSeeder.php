@@ -43,8 +43,8 @@ class AbilitiesSeeder extends Seeder
                 'assign_quiz_to_assessment' => ['DEPT_HEAD', 'DEV_LEAD'],
                 'create_quiz_questions' => ['DEPT_HEAD', 'DEV_LEAD', 'SENIOR_DEV', 'DEV'],
                 'approve_quiz_questions' => ['DEPT_HEAD', 'DEV_LEAD'],
-                'create_file_upload_requirement' => ['DEPT_HEAD', 'DEV_LEAD'],
-                'create_code_download_requirement' => ['DEPT_HEAD', 'DEV_LEAD'],
+                'create_file_upload_requirement' => ['DEPT_HEAD', 'DEV_LEAD'],  // This is for uploading a file for a question
+                'create_code_download_requirement' => ['DEPT_HEAD', 'DEV_LEAD'], // This is downloading code for an assessment
             ]
         ];
 

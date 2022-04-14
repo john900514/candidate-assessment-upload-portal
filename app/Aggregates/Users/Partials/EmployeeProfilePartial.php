@@ -25,4 +25,9 @@ class EmployeeProfilePartial extends AggregatePartial
                 $this->employee_status = 'employee';
         }
     }
+
+    public function getEmployeeStatus()
+    {
+        return $this->employee_status;
+    }
 }
