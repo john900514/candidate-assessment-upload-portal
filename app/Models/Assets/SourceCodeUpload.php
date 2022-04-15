@@ -10,4 +10,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class SourceCodeUpload extends Model
 {
     use HasFactory, SoftDeletes, CrudTrait;
+
+    public function file_record()
+    {
+        return $this->belongsTo(UploadedFile::class, 'file_id', 'id');
+    }
 }

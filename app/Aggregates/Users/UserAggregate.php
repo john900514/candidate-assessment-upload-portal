@@ -113,6 +113,10 @@ class UserAggregate extends AggregateRoot
         return $this->candidate_profile->getOpenJobPositions();
     }
 
+    public function getCandidateStatus()
+    {
+        return $this->candidate_profile->getCandidateStatus();
+    }
     public function isApplicant()
     {
         return $this->candidate_profile->getCandidateStatus() != 'non-candidate';

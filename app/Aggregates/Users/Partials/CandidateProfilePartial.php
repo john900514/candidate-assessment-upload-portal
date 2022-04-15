@@ -12,6 +12,8 @@ class CandidateProfilePartial extends AggregatePartial
 {
     protected string $candidate_status = 'unqualified-candidate';
     protected array $open_job_positions = [];
+
+    protected array $application_statuses = [];
     protected bool $has_submitted_resume = false;
 
     public function applyUserCreated(UserCreated $event)
@@ -78,6 +80,14 @@ class CandidateProfilePartial extends AggregatePartial
     public function applyApplicantLinkedToJobPosition(ApplicantLinkedToJobPosition $event)
     {
         $this->open_job_positions = $event->job_positions;
+
+        foreach ($this->open_job_positions as $idx => $job_id)
+        {
+            if(!array_key_exists($job_id, $this->application_statuses))
+            {
+                $this->application_statuses[$job_id] = [];
+            }
+        }
     }
 
     public function updateCandidateRole(string $role) : self

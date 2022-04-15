@@ -5,6 +5,7 @@ namespace App\Aggregates\Assets;
 use App\Exceptions\Assets\UploadedFileException;
 use App\Models\Assets\SourceCodeUpload;
 use App\StorableEvents\Assets\Files\NewSourceCodeFileCreated;
+use Illuminate\Support\Facades\Storage;
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
 
 class FileUploadAggregate extends AggregateRoot
@@ -49,5 +50,17 @@ class FileUploadAggregate extends AggregateRoot
     public function getFilePath() : string | null
     {
         return $this->path;
+    }
+
+    public function getTemporaryUrl() : string | false
+    {
+        $results = false;
+
+        if(!is_null($this->path))
+        {
+            $results = Storage::disk('s3')->temporaryUrl($this->path, now()->addMinutes(10));
+        }
+
+        return $results;
     }
 }
