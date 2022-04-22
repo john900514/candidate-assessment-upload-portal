@@ -17,6 +17,7 @@ Route::group([
 ], function () { // custom admin routes
     Route::post('edit-account-info/access-token', 'Users\Auth\AccessToken')->name('backpack.account.access-token');
     Route::post('assets/download-installer', 'Assets\DownloadInstallerAction')->name('download-installer');
+    Route::post('users/{user_id}/resend-email', 'Users\Auth\ResendWelcomeEmail')->name('user.resend-email');
     Route::get('candidates/user-open-jobs', 'Candidate\Users\FetchOpenJobs');
 });
 
@@ -29,7 +30,7 @@ Route::group([
     'namespace'  => 'App\Http\Controllers',
 ], function () { // custom admin routes
     Route::get('dashboard', 'DashboardController@index')->name('backpack.dashboard');
-    Route::get('assessments', 'Candidates\Assessments\AssessmentViewerController@index')->name('backpack.dashboard');
+    Route::get('assessments', 'Candidates\Assessments\AssessmentViewerController@index')->name('assessments.dashboard');
     Route::get('edit-account-info', 'UserAccountController@index')->name('backpack.account.info');
 });
 

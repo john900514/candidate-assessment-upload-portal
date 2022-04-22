@@ -10,6 +10,7 @@ use App\Http\Requests\Users\UserManagementRequest;
 use App\Models\Candidates\JobPosition;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Class UserManagementCrudController
@@ -19,7 +20,7 @@ use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 class UserManagementCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation  { store as traitStore; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation  { update as traitUpdate; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
@@ -93,6 +94,7 @@ class UserManagementCrudController extends CrudController
          * - CRUD::column('price')->type('number');
          * - CRUD::addColumn(['name' => 'price', 'type' => 'number']);
          */
+        $this->crud->addButtonFromView('line','Resend Email','resend-welcome-email', 'beginning');
     }
 
     /**
@@ -104,14 +106,91 @@ class UserManagementCrudController extends CrudController
     protected function setupCreateOperation()
     {
         CRUD::setValidation(UserManagementRequest::class);
+        //CRUD::setFromDb(); // columns
+        $data = request()->all();
 
-        CRUD::setFromDb(); // fields
+        $status = $data['status'] ?? '';
+        CRUD::field('new_user')->type('user-create-form')->value($status);
+
+        if($status == 'candidate')
+        {
+            CRUD::field('email');
+
+            $roles = [
+                'FE_CANDIDATE'   => 'Frontend Applicant',
+                'BE_CANDIDATE'   => 'Backend Candidate',
+                'FS_CANDIDATE'   => 'FullStack Candidate',
+                //'MGNT_CANDIDATE' => 'Management Candidate',
+                //'APPLICANT'      => 'Unqualified Applicant'
+            ];
+
+            $this->crud->field('role')->type('select_from_array')->options($roles);
+
+            $this->crud->addField([
+                'label' => 'Link Job Position(s) to Applicant',
+                'type' => 'select_multiple',
+                'name' => 'positions',
+                'model' => JobPosition::class,
+                'attribute' => 'job_title',
+                'options'   => (function ($query) {
+                    return $query->where('active', 1)->get();
+                })
+            ]);
+
+            $this->crud->field('send_welcome_email')->type('boolean')->default(true)
+                ->label('Send Welcome Email?');
+
+        }
+        else if($status == 'employee')
+        {
+            CRUD::field('status')->type('select_from_array')->options(['fuck you', 'kiss my ass']);
+        }
+
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
          * - CRUD::field('price')->type('number');
          * - CRUD::addField(['name' => 'price', 'type' => 'number']));
          */
+    }
+
+    public function store()
+    {
+        $data = request()->all();
+
+        $uuid = Uuid::uuid4()->toString();
+        $dev = [
+            'first_name' => $data['first_name'] ?? '',
+            'last_name' => $data['last_name'] ?? '',
+            'email' => $data['email'],
+            'name' => $data['name'] ?? '',
+            'password' => bcrypt('er]sawrkaxgjkpwrbdmbpqe]'),
+        ];
+        $role = strtolower($data['role']);
+
+        try {
+            $aggy = UserAggregate::retrieve($uuid)
+                ->createUser($dev, $role)
+                ->updateCandidatesAvailablePositions($data['positions']);
+
+            if($data['send_welcome_email'])
+            {
+                $aggy = $aggy->sendWelcomeEmail($data['status']);
+            }
+
+            $aggy->persist();
+        }
+        catch(\DomainException $e)
+        {
+            \Alert::add('error','Could not do the thing. Sorry. '.$e->getMessage())->flash();
+            $this->crud->setSaveAction();
+            return redirect()->back();
+        }
+
+
+        \Alert::add('success','Done.')->flash();
+        $this->crud->setSaveAction();
+        return $this->crud->performSaveAction($uuid);
     }
 
     /**

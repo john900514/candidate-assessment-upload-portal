@@ -16,7 +16,10 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "lorisleiva/laravel-actions": "^2.4",
         "silber/bouncer": "^1.0",
-        "spatie/laravel-event-sourcing": "^7.2"
+        "spatie/laravel-event-sourcing": "^7.2",
+        "symfony/http-client": "^6.0",
+        "symfony/mailgun-mailer": "^6.0",
+        "tightenco/ziggy": "^1.4"
     },
     "require-dev": {
         "backpack/generators": "^3.1",
@@ -67,34 +70,6 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "repositories": {
-        "backpack/devtools": {
-            "type": "composer",
-            "url": "https://repo.backpackforlaravel.com"
-        },
-        "backpack/devtools": {
-            "type": "composer",
-            "url": "https://repo.backpackforlaravel.com"
-        },
-        "backpack/devtools": {
-            "type": "composer",
-            "url": "https://repo.backpackforlaravel.com"
-        },
-        "backpack/devtools": {
-            "type": "composer",
-            "url": "https://repo.backpackforlaravel.com"
-        },
-        "backpack/devtools": {
-            "type": "composer",
-            "url": "https://repo.backpackforlaravel.com"
-        },
-        "backpack/devtools": {
-            "type": "composer",
-            "url": "https://repo.backpackforlaravel.com"
-        },
-        "backpack/devtools": {
-            "type": "composer",
-            "url": "https://repo.backpackforlaravel.com"
-        },
         "backpack/devtools": {
             "type": "composer",
             "url": "https://repo.backpackforlaravel.com"

@@ -7,6 +7,7 @@ use App\Aggregates\Users\Partials\CandidateProfilePartial;
 use App\Aggregates\Users\Partials\EmployeeProfilePartial;
 use App\Aggregates\Users\Partials\UserActivityPartial;
 use App\Exceptions\Users\UserAuthException;
+use App\StorableEvents\Users\Activity\Email\UserSentWelcomeEmail;
 use App\StorableEvents\Users\ApplicantCreated;
 use App\StorableEvents\Users\Applicants\ApplicantRoleChanged;
 use App\StorableEvents\Users\UserCreated;
@@ -17,6 +18,7 @@ class UserAggregate extends AggregateRoot
     protected string|null $email = null;
     protected string|null $first_name = null;
     protected string|null $role = 'applicant';
+    protected bool $verified = false;
 
     protected EmployeeProfilePartial $employee_profile;
     protected CandidateProfilePartial $candidate_profile;
@@ -56,15 +58,19 @@ class UserAggregate extends AggregateRoot
             throw UserAuthException::userAlreadyExists($details['email']);
         }
 
-        if($role == 'applicant')
+        switch($role)
         {
-            $this->recordThat(new ApplicantCreated($this->uuid(), $details, $role));
-        }
-        else
-        {
-            $this->recordThat(new UserCreated($this->uuid(), $details, $role));
-        }
+            case 'applicant':
+            case 'fs_candidate':
+            case 'fe_candidate':
+            case 'be_candidate':
+            case 'mgnt_candidate':
+                $this->recordThat(new ApplicantCreated($this->uuid(), $details, $role));
+                break;
 
+            default:
+                $this->recordThat(new UserCreated($this->uuid(), $details, $role));
+        }
 
         return $this;
     }
@@ -84,6 +90,17 @@ class UserAggregate extends AggregateRoot
     public function updateCandidatesAvailablePositions(array $positions) : self
     {
         $this->candidate_profile->updateCandidatesAvailablePositions($positions);
+        return $this;
+    }
+
+    public function sendWelcomeEmail(string $status) : self
+    {
+        if($this->verified)
+        {
+            throw UserAuthException::userAlreadyVerified();
+        }
+
+        $this->activity->sendWelcomeEmail($status);
         return $this;
     }
 
@@ -125,5 +142,10 @@ class UserAggregate extends AggregateRoot
     public function isEmployee()
     {
         return $this->employee_profile->getEmployeeStatus() == 'employee';
+    }
+
+    public function isUserVerified() : bool
+    {
+        return $this->verified;
     }
 }
