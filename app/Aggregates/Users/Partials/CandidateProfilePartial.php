@@ -39,7 +39,7 @@ class CandidateProfilePartial extends AggregatePartial
 
     public function applyApplicantCreated(ApplicantCreated $event)
     {
-        switch($event->role)
+        switch(strtoupper($event->role))
         {
             case 'FE_CANDIDATE':
             case 'BE_CANDIDATE':

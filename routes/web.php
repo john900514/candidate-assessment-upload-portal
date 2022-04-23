@@ -18,3 +18,4 @@ Route::get('/', function () {
 });
 
 Route::get('/portal/registration',  'App\Http\Controllers\Users\UserRegistrationController@index');
+Route::post('/portal/registration',  'App\Http\Controllers\Users\UserRegistrationController@finish_registration');

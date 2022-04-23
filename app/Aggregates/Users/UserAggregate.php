@@ -7,16 +7,20 @@ use App\Aggregates\Users\Partials\CandidateProfilePartial;
 use App\Aggregates\Users\Partials\EmployeeProfilePartial;
 use App\Aggregates\Users\Partials\UserActivityPartial;
 use App\Exceptions\Users\UserAuthException;
+use App\StorableEvents\Users\Activity\Account\PasswordUpdated;
+use App\StorableEvents\Users\Activity\Account\UserVerified;
 use App\StorableEvents\Users\Activity\Email\UserSentWelcomeEmail;
 use App\StorableEvents\Users\ApplicantCreated;
 use App\StorableEvents\Users\Applicants\ApplicantRoleChanged;
 use App\StorableEvents\Users\UserCreated;
+use App\StorableEvents\Users\UserUpdated;
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
 
 class UserAggregate extends AggregateRoot
 {
     protected string|null $email = null;
     protected string|null $first_name = null;
+    protected string|null $last_name = null;
     protected string|null $role = 'applicant';
     protected bool $verified = false;
 
@@ -36,9 +40,22 @@ class UserAggregate extends AggregateRoot
     public function applyUserCreated(UserCreated $event)
     {
         $this->first_name = $event->details['first_name'];
+        $this->last_name = $event->details['last_name'];
         $this->email = $event->details['email'];
         $this->role  = $event->role;
     }
+    public function applyUserUpdated(UserUpdated $event)
+    {
+        $this->first_name = $event->details['first_name'];
+        $this->last_name = $event->details['last_name'];
+        $this->email = $event->details['email'];
+    }
+
+    public function applyUserVerified(UserVerified $event)
+    {
+        $this->verified = true;
+    }
+
     public function applyApplicantCreated(ApplicantCreated $event)
     {
         $this->first_name = $event->details['first_name'];
@@ -110,6 +127,30 @@ class UserAggregate extends AggregateRoot
         return $this;
     }
 
+    public function updateUser(array $user_data) : self
+    {
+        $this->recordThat(new UserUpdated($this->uuid(), $user_data));
+        return $this;
+    }
+
+    public function updatePassword(string $enc_pw) : self
+    {
+        $this->recordThat(new PasswordUpdated($this->uuid(), $enc_pw));
+        return $this;
+    }
+
+    public function verifyUser(string $date) : self
+    {
+        if($this->verified)
+        {
+            throw UserAuthException::userAlreadyVerified();
+        }
+
+        $this->recordThat(new UserVerified($this->uuid(), $date));
+
+        return $this;
+    }
+
     public function getAccessToken() : string | false
     {
         return $this->access_token->getAccessToken();
@@ -123,6 +164,11 @@ class UserAggregate extends AggregateRoot
     public function getFirstName() : string|null
     {
         return $this->first_name;
+    }
+
+    public function getEmail() : string|null
+    {
+        return $this->email;
     }
 
     public function getOpenJobPositions() : array

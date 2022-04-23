@@ -4,10 +4,13 @@ namespace App\Projectors\Users;
 
 use App\Models\User;
 use App\Models\UserDetails;
+use App\StorableEvents\Users\Activity\Account\PasswordUpdated;
+use App\StorableEvents\Users\Activity\Account\UserVerified;
 use App\StorableEvents\Users\ApplicantCreated;
 use App\StorableEvents\Users\Applicants\ApplicantLinkedToJobPosition;
 use App\StorableEvents\Users\Applicants\ApplicantRoleChanged;
 use App\StorableEvents\Users\UserCreated;
+use App\StorableEvents\Users\UserUpdated;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 use Spatie\EventSourcing\EventHandlers\Projectors\Projector;
 use App\StorableEvents\Users\Activity\API\AccessTokenGranted;
@@ -84,5 +87,23 @@ class UserAuthProjector extends Projector
 
         $deet->value = base64_encode($token);
         $deet->save();
+    }
+
+    public function onUserUpdated(UserUpdated $event)
+    {
+        $user = User::find($event->user_id);
+        $user->update($event->details);
+    }
+
+    public function onUserVerified(UserVerified $event)
+    {
+        $user = User::find($event->user_id);
+        $user->update(['email_verified_at' => $event->date]);
+    }
+
+    public function onPasswordUpdated(PasswordUpdated $event)
+    {
+        $user = User::find($event->user_id);
+        $user->update(['password' => $event->getPw()]);
     }
 }

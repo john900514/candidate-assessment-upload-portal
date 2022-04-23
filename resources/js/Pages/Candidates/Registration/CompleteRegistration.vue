@@ -65,7 +65,7 @@ export default {
     components: {
         BasicAssLayout
     },
-    props: ['role', 'email'],
+    props: ['role', 'email', 'userId'],
     data() {
         return {
             form: {
@@ -80,7 +80,31 @@ export default {
     methods: {
         submitForm() {
             if(this.validateForm()) {
-                alert('sick')
+                let payload = this.form;
+                payload['status'] = 'candidate';
+                payload['user_id'] = this.userId;
+
+                axios.post('/portal/registration', payload)
+                    .then(({ data }) => {
+                        new Noty({
+                            theme: 'sunset',
+                            type: 'success',
+                            text: "Success! Redirecting you...",
+                            timeout: 4000
+                        }).show()
+
+                        setTimeout(function() {
+                            window.location.href = '/portal/login'
+                        }, 1500)
+                    })
+                    .catch( err => {
+                        new Noty({
+                            theme: 'sunset',
+                            type: 'error',
+                            text: "Could not complete your registration!"+err,
+                            timeout: 4000
+                        }).show()
+                    })
             }
         },
         validateForm() {

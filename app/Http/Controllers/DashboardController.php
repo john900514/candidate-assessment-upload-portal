@@ -27,9 +27,10 @@ class DashboardController extends Controller
 
         $aggy = UserAggregate::retrieve(backpack_user()->id);
 
-
         if($aggy->isApplicant())
         {
+            // @todo - if user has not uploaded their resume, redirect to the resume upload page.
+            // otherwise, do this stuff below
             $this->data['widgets'] = [
                 'before_content' => [
                     [
