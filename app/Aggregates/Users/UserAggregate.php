@@ -194,4 +194,9 @@ class UserAggregate extends AggregateRoot
     {
         return $this->verified;
     }
+
+    public function hasSubmittedResume() : bool
+    {
+        return $this->candidate_profile->hasSubmittedResume();
+    }
 }

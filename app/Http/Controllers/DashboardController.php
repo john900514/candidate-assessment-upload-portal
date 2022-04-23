@@ -29,32 +29,40 @@ class DashboardController extends Controller
 
         if($aggy->isApplicant())
         {
-            // @todo - if user has not uploaded their resume, redirect to the resume upload page.
-            // otherwise, do this stuff below
-            $this->data['widgets'] = [
-                'before_content' => [
-                    [
-                        'type'        => 'card',
-                        'content' => [
-                            'header' => 'Download the Installer',
-                            'body' => view('card-bodies.download-the-installer')->render()
-                        ],
-                        'class' => 'bg-info',
-                        'wrapper' => ['class' => 'col-6']
+            // @todo - if user has  uploaded their resume, send to the dashbaord
 
-                    ],
-                    [
-                        'type'        => 'card',
-                        'content' => [
-                            'header' => $aggy->getFirstName()."'s Open Positions",
-                            'body' => view('card-bodies.applicants-open-positions')->render()
-                        ],
-                        'class' => 'bg-success',
-                        'wrapper' => ['class' => 'col-6']
+            if($aggy->hasSubmittedResume())
+            {
+                $this->data['widgets'] = [
+                    'before_content' => [
+                        [
+                            'type'        => 'card',
+                            'content' => [
+                                'header' => 'Download the Installer',
+                                'body' => view('card-bodies.download-the-installer')->render()
+                            ],
+                            'class' => 'bg-info',
+                            'wrapper' => ['class' => 'col-6']
 
+                        ],
+                        [
+                            'type'        => 'card',
+                            'content' => [
+                                'header' => $aggy->getFirstName()."'s Open Positions",
+                                'body' => view('card-bodies.applicants-open-positions')->render()
+                            ],
+                            'class' => 'bg-success',
+                            'wrapper' => ['class' => 'col-6']
+
+                        ]
                     ]
-                ]
-            ];
+                ];
+            }
+            else
+            {
+                // otherwise, redirect to the resume upload page.
+                return redirect('/portal/registration/upload-resume');
+            }
         }
         else
         {

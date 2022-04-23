@@ -111,4 +111,9 @@ class CandidateProfilePartial extends AggregatePartial
     {
         return $this->candidate_status;
     }
+
+    public function hasSubmittedResume() : bool
+    {
+        return $this->has_submitted_resume;
+    }
 }

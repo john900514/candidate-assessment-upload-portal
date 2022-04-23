@@ -20,4 +20,9 @@ class UserAuthException extends DomainException
     {
         return new self("This user does not have permission to be granted an access token");
     }
+
+    public static function accessDenied() : self
+    {
+        return new self("This area is restricted.");
+    }
 }

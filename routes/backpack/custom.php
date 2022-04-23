@@ -32,6 +32,8 @@ Route::group([
     Route::get('dashboard', 'DashboardController@index')->name('backpack.dashboard');
     Route::get('assessments', 'Candidates\Assessments\AssessmentViewerController@index')->name('assessments.dashboard');
     Route::get('edit-account-info', 'UserAccountController@index')->name('backpack.account.info');
+    Route::get('/registration/upload-resume', 'Users\UserRegistrationController@show_resume_uploader')->name('candidates.resume-uploader');
+    Route::post('/registration/upload-resume', 'Users\UserRegistrationController@upload_resume')->name('candidates.upload-resume');
 });
 
 Route::group([

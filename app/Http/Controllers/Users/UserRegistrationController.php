@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Users;
 
 use App\Aggregates\Users\UserAggregate;
+use App\Exceptions\Users\UserAuthException;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -85,5 +86,24 @@ class UserRegistrationController extends Controller
         {
             return response('No.', 401);
         }
+    }
+
+    public function show_resume_uploader()
+    {
+        $aggy = UserAggregate::retrieve(backpack_user()->id);
+        if($aggy->isApplicant() && (!$aggy->hasSubmittedResume()))
+        {
+            $data = [];
+            return Inertia::render('Candidates/Registration/UploadResume', $data);
+        }
+        else
+        {
+            throw UserAuthException::accessDenied();
+        }
+    }
+
+    public function upload_resume()
+    {
+
     }
 }
