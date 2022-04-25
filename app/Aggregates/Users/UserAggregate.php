@@ -151,6 +151,18 @@ class UserAggregate extends AggregateRoot
         return $this;
     }
 
+    public function submitResume(string $path) : self
+    {
+        if(!$this->isApplicant())
+        {
+            UserAuthException::resumeNotNeeded();
+        }
+
+        $this->candidate_profile->submitResume($path);
+
+        return $this;
+    }
+
     public function getAccessToken() : string | false
     {
         return $this->access_token->getAccessToken();

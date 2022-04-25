@@ -9,4 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class UserFileUpload extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $fillable = ['file_id', 'user_id', 'file_nickname', 'description','active'];
 }

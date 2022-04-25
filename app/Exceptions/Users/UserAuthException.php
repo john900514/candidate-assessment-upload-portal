@@ -16,6 +16,7 @@ class UserAuthException extends DomainException
         return new self("User is already verified. No more welcome emails can be sent.");
     }
 
+
     public static function accessTokenPermissionDenied() : self
     {
         return new self("This user does not have permission to be granted an access token");
@@ -24,5 +25,10 @@ class UserAuthException extends DomainException
     public static function accessDenied() : self
     {
         return new self("This area is restricted.");
+    }
+
+    public static function resumeNotNeeded() : self
+    {
+        return new self("User is not  candidate. No resume upload is necessary.");
     }
 }

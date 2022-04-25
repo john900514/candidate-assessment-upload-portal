@@ -2,6 +2,8 @@
 
 namespace App\Projectors\Users;
 
+use App\Models\Assets\UploadedFile;
+use App\Models\Assets\UserFileUpload;
 use App\Models\User;
 use App\Models\UserDetails;
 use App\StorableEvents\Users\Activity\Account\PasswordUpdated;
@@ -9,6 +11,7 @@ use App\StorableEvents\Users\Activity\Account\UserVerified;
 use App\StorableEvents\Users\ApplicantCreated;
 use App\StorableEvents\Users\Applicants\ApplicantLinkedToJobPosition;
 use App\StorableEvents\Users\Applicants\ApplicantRoleChanged;
+use App\StorableEvents\Users\Applicants\ApplicantUploadedResume;
 use App\StorableEvents\Users\UserCreated;
 use App\StorableEvents\Users\UserUpdated;
 use Silber\Bouncer\BouncerFacade as Bouncer;
@@ -105,5 +108,30 @@ class UserAuthProjector extends Projector
     {
         $user = User::find($event->user_id);
         $user->update(['password' => $event->getPw()]);
+    }
+
+    public function onApplicantUploadedResume(ApplicantUploadedResume $event)
+    {
+        $uploaded_file_record = UploadedFile::firstOrCreate([
+            'file_path' => $event->path,
+            'entity_id' => $event->user_id,
+            'entity' => User::class,
+            'active' => 1
+        ]);
+
+        $user_file_upload = UserFileUpload::firstOrCreate([
+            'file_id' => $uploaded_file_record->id,
+            'user_id' => $event->user_id,
+            'file_nickname' => 'Candidate Resume',
+            'description' => 'The candidate\'s resume.'
+        ]);
+
+        $detail = UserDetails::firstOrCreate([
+            'user_id' => $event->user_id,
+            'name' => 'resume_uploaded',
+        ]);
+        $detail->value = $user_file_upload->id;
+        $detail->misc = ['path' => $event->path];
+        $detail->save();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Aggregates\Users\Partials;
 use App\StorableEvents\Users\ApplicantCreated;
 use App\StorableEvents\Users\Applicants\ApplicantLinkedToJobPosition;
 use App\StorableEvents\Users\Applicants\ApplicantRoleChanged;
+use App\StorableEvents\Users\Applicants\ApplicantUploadedResume;
 use App\StorableEvents\Users\UserCreated;
 use Spatie\EventSourcing\AggregateRoots\AggregatePartial;
 
@@ -15,6 +16,7 @@ class CandidateProfilePartial extends AggregatePartial
 
     protected array $application_statuses = [];
     protected bool $has_submitted_resume = false;
+    protected string|null $resume_path = null;
 
     public function applyUserCreated(UserCreated $event)
     {
@@ -90,6 +92,12 @@ class CandidateProfilePartial extends AggregatePartial
         }
     }
 
+    public function applyApplicantUploadedResume(ApplicantUploadedResume $event)
+    {
+        $this->has_submitted_resume = true;
+        $this->resume_path = $event->path;
+    }
+
     public function updateCandidateRole(string $role) : self
     {
         $this->recordThat(new ApplicantRoleChanged($this->aggregateRootUuid(), $role));
@@ -99,6 +107,12 @@ class CandidateProfilePartial extends AggregatePartial
     public function updateCandidatesAvailablePositions(array $positions) : self
     {
         $this->recordThat(new ApplicantLinkedToJobPosition($this->aggregateRootUuid(),$positions ));
+        return $this;
+    }
+
+    public function submitResume(string $path) : self
+    {
+        $this->recordThat(new ApplicantUploadedResume($this->aggregateRootUuid(), $path));
         return $this;
     }
 

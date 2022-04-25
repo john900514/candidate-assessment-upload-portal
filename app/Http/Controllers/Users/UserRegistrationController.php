@@ -7,6 +7,7 @@ use App\Exceptions\Users\UserAuthException;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class UserRegistrationController extends Controller
@@ -90,10 +91,13 @@ class UserRegistrationController extends Controller
 
     public function show_resume_uploader()
     {
-        $aggy = UserAggregate::retrieve(backpack_user()->id);
+        $user = backpack_user();
+        $aggy = UserAggregate::retrieve($user->id);
         if($aggy->isApplicant() && (!$aggy->hasSubmittedResume()))
         {
-            $data = [];
+            $data = [
+                'userId' => $user->id
+            ];
             return Inertia::render('Candidates/Registration/UploadResume', $data);
         }
         else
@@ -104,6 +108,37 @@ class UserRegistrationController extends Controller
 
     public function upload_resume()
     {
+        $results = 'Missing File';
+        $code = 500;
 
+        if(request()->has('file'))
+        {
+            $user = backpack_user();
+            $file = request()->file('file');
+            $folder = 'candidate_assessment/users/'.$user->id.'/resumes';
+            $name = $file->getClientOriginalName();
+            // Upload the file to the user's resume folder
+            $path =  Storage::disk('s3')->putFileAs($folder, $file, $name);
+
+            try {
+                UserAggregate::retrieve($user->id)
+                    ->submitResume($path)->persist();
+
+                $code = 200;
+                $results = true;
+            }
+            catch (\Exception $e)
+            {
+                $results = $e->getMessage();
+            }
+
+            /**
+             * STEPS
+             * 1.
+             * 2. Use the user Aggregate and log resume uploaded.
+             */
+        }
+
+        return response($results, $code);
     }
 }
