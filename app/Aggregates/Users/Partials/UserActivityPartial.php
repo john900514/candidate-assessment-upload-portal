@@ -10,12 +10,14 @@ class UserActivityPartial extends AggregatePartial
 {
     protected array $files_downloaded = [];
     protected array $activity = [];
+    protected bool $installer_downloaded_before = false;
 
     public function applyUserDownloadedSourceCodeInstaller(UserDownloadedSourceCodeInstaller $event)
     {
         if(!array_key_exists('Source Code Installer', $this->files_downloaded))
         {
             $this->files_downloaded['Source Code Installer'] = [];
+            $this->installer_downloaded_before = true;
         }
 
         $this->files_downloaded['Source Code Installer'][] = $event->date;
@@ -37,5 +39,10 @@ class UserActivityPartial extends AggregatePartial
     {
         $this->recordThat(new UserSentWelcomeEmail($this->aggregateRootUuid(), $status));
         return $this;
+    }
+
+    public function hasDownloadedInstaller() : bool
+    {
+        return $this->installer_downloaded_before;
     }
 }

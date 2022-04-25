@@ -211,4 +211,9 @@ class UserAggregate extends AggregateRoot
     {
         return $this->candidate_profile->hasSubmittedResume();
     }
+
+    public function hasDownloadedInstaller() : bool
+    {
+        return $this->activity->hasDownloadedInstaller();
+    }
 }

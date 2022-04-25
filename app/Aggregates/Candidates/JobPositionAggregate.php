@@ -43,7 +43,24 @@ class JobPositionAggregate extends AggregateRoot
 
     public function applyAssessmentsAddedOrUpdatedToJobPosition(AssessmentsAddedOrUpdatedToJobPosition $event)
     {
-        $this->assessments = $event->assessments;
+        //$this->assessments = $event->assessments;
+
+        foreach ($event->assessments as $assessment)
+        {
+            $exists_already = false;
+            foreach($this->assessments as $existing)
+            {
+                if($existing == $assessment)
+                {
+                    $exists_already = true;
+                    break;
+                }
+            }
+            if(!$exists_already)
+            {
+                $this->assessments[] = $assessment;
+            }
+        }
     }
 
     public function applyJobDescription(JobDescription $event)
@@ -98,7 +115,16 @@ class JobPositionAggregate extends AggregateRoot
 
     public function getAssessments() : array
     {
-        return $this->assessments;
+        $results = [];
+        foreach($this->assessments as $assessment)
+        {
+            if(!array_key_exists($assessment, $results))
+            {
+                $results[$assessment] = $assessment;
+            }
+        }
+
+        return $results;
     }
 
     public function getDesc() : string | null

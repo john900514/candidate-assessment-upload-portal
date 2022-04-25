@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Candidate\ToDos\GetToDoList;
 use App\Aggregates\Users\UserAggregate;
 use Illuminate\Http\Request;
 
@@ -29,10 +30,10 @@ class DashboardController extends Controller
 
         if($aggy->isApplicant())
         {
-            // @todo - if user has  uploaded their resume, send to the dashbaord
-
             if($aggy->hasSubmittedResume())
             {
+                $todo_list_data = GetToDoList::run(backpack_user()->id);
+
                 $this->data['widgets'] = [
                     'before_content' => [
                         [
@@ -48,11 +49,21 @@ class DashboardController extends Controller
                         [
                             'type'        => 'card',
                             'content' => [
+                                'header' => 'Your ToDo List',
+                                'body' => view('card-bodies.applicants-todo-list', ['list' => $todo_list_data])->render()
+                            ],
+                            'class' => 'bg-secondary',
+                            'wrapper' => ['class' => 'col-6']
+
+                        ],
+                        [
+                            'type'        => 'card',
+                            'content' => [
                                 'header' => $aggy->getFirstName()."'s Open Positions",
                                 'body' => view('card-bodies.applicants-open-positions')->render()
                             ],
                             'class' => 'bg-success',
-                            'wrapper' => ['class' => 'col-6']
+                            'wrapper' => ['class' => 'col-6 pt-4']
 
                         ]
                     ]

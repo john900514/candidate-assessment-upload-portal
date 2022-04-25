@@ -38,7 +38,10 @@ class GetUserScopedAvailableSourceCodes
                         {
                             foreach ($job_tests as $assessment_id)
                             {
-                                $assessments[] = $assessment_id;
+                                if(!array_key_exists($assessment_id, $assessments))
+                                {
+                                    $assessments[$assessment_id] = $assessment_id;
+                                }
                             }
                         }
 
@@ -56,7 +59,10 @@ class GetUserScopedAvailableSourceCodes
                             {
                                 if($code_id = $ass_aggy->getCodeWorkId())
                                 {
-                                    $source_codes[] = $code_id;
+                                    if(!array_key_exists($code_id, $source_codes))
+                                    {
+                                        $source_codes[$code_id] = $code_id;
+                                    }
                                 }
                             }
                         }
