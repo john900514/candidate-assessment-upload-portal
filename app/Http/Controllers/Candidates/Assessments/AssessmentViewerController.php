@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Candidates\Assessments;
 
+use App\Aggregates\Candidates\JobPositionAggregate;
 use App\Aggregates\Users\UserAggregate;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -18,6 +19,20 @@ class AssessmentViewerController extends Controller
             \Alert::add('warning', 'This area is for Candidates. If you are a developer. Use your local to log in as an applicant.')->flash();
             return redirect()->back();
         }
+
+        $available_assessments = [];
+        $open_ids = $aggy->getOpenJobPositions();
+        if(count($open_ids) > 0)
+        {
+            foreach ($open_ids as $open_id)
+            {
+                $job_aggy = JobPositionAggregate::retrieve($open_id);
+                $assessments = $job_aggy->getAssessments();
+                $available_assessments[$open_id] = $assessments;
+            }
+        }
+
+        dd($available_assessments);
 
         return view('cms-custom-pages.candidates.assessments.assessment-dashboard', $data);
     }

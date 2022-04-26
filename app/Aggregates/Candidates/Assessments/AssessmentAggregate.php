@@ -20,7 +20,6 @@ class AssessmentAggregate extends AggregateRoot
     protected string|null $approved_by_user = null;
     protected array $history = [];
 
-
     protected AssessmentQuizPartial $quizzes;
     protected AssessmentCodeWorkPartial $code_work;
 
@@ -122,5 +121,10 @@ class AssessmentAggregate extends AggregateRoot
     public function getTasks() : array
     {
         return $this->code_work->getTasks();
+    }
+
+    public function getName() : string|null
+    {
+        return $this->name;
     }
 }

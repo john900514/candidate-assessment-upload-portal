@@ -26,5 +26,5 @@
 @endif
 
 @if($user_aggy->isApplicant())
-    <li class='nav-item'><a class='nav-link' href='{{ backpack_url('assessments') }}'><i class="las la-pen-alt"></i> Assessments</a></li>
+    <!-- <li class='nav-item'><a class='nav-link' href='{{ backpack_url('assessments') }}'><i class="las la-pen-alt"></i> Assessments</a></li> -->
 @endif
