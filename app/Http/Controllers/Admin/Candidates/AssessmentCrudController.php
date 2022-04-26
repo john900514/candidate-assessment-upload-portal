@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Candidates;
 use App\Actions\Candidate\Assessments\CreateNewAssessmentAction;
 use App\Aggregates\Candidates\Assessments\AssessmentAggregate;
 use App\Enums\JobTypeEnum;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 use App\Exceptions\Candidates\AssessmentException;
 use App\Http\Requests\Candidates\AssessmentRequest;
 use App\Models\Assets\SourceCodeUpload;
@@ -44,13 +45,28 @@ class AssessmentCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::setFromDb(); // columns
 
+        CRUD::column('assessment_name')->type('text')->label('Name');
+        CRUD::column('concentration')->type('closure')
+            ->function(function ($entry) {
+                $role = strtoupper($entry->concentration);
+                return JobTypeEnum::from($role)->name;
+            });
+        CRUD::column('has_source_code')->type('boolean')->label('Has Code');
+        CRUD::column('has_quizzes')->type('boolean')->label('Has Quiz');
+        CRUD::column('active')->type('boolean');
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
          * - CRUD::addColumn(['name' => 'price', 'type' => 'number']);
          */
+        $this->crud->denyAccess('show');
+        if(!Bouncer::is(backpack_user())->a('admin', 'dept_head'))
+        {
+            $this->crud->denyAccess('create');
+            $this->crud->denyAccess('update');
+            $this->crud->denyAccess('delete');
+        }
     }
 
     /**
@@ -75,7 +91,7 @@ class AssessmentCrudController extends CrudController
          */
         $aggy = AssessmentAggregate::retrieve($this->crud->getCurrentEntryId());
 
-        CRUD::field('assessment_name')->type('text')->attributes(['required' => 'required']);
+        CRUD::field('assessment_name')->type('text')->attributes(['required' => 'required'])->tab('Config');
 
         $job_types = [];
         foreach(collect(JobTypeEnum::cases()) as $enum)
@@ -84,15 +100,18 @@ class AssessmentCrudController extends CrudController
         }
 
         $this->crud->field('concentration')->type('select_from_array')
-            ->options($job_types)->wrapper(['class' => 'col-6']);
+            ->options($job_types)->wrapper(['class' => 'col-6'])
+            ->tab('Config');
 
         $this->crud->field('has_quizzes')->type('boolean')
             ->hint('(Optional) Assessment has questions to be submitted.')
-            ->wrapper(['class' => 'col-3']);
+            ->wrapper(['class' => 'col-3'])
+            ->tab('Config');
 
         $this->crud->field('has_source_code')->type('boolean')
             ->hint('(Optional)')
-            ->wrapper(['class' => 'col-3']);
+            ->wrapper(['class' => 'col-3'])
+            ->tab('Config');
     }
 
     public function store()
@@ -162,14 +181,20 @@ class AssessmentCrudController extends CrudController
             CRUD::field('source_code_record')->attributes(['required' => 'required'])
                 ->type('select_from_array')->options($options)
                 ->attributes(['required' => 'required'])->label('Add Source Code')
-                ->value($aggy->getCodeWorkId() ?? '');
+                ->value($aggy->getCodeWorkId() ?? '')->tab('Config');
         }
 
         if(($aggy->hasCodeWork() || $aggy->hasQuizzes()) && backpack_user()->can('approve_assessments'))
         {
             $this->crud->field('active')->type('boolean')
-                ->hint('Must have either source code or quizzes toggled and selected to activate!');
+                ->hint('Must have either source code or quizzes toggled and selected to activate!')
+                ->tab('Config');
         }
+
+        $tasks = $aggy->getTasks();
+        $this->crud->field('table_of_tasks')->type('view')
+            ->view('card-bodies.assessment-tasks-table')->value($tasks)
+            ->tab('Tasks');
     }
 
     public function update()

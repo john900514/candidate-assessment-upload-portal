@@ -86,6 +86,24 @@ class AssessmentAggregate extends AggregateRoot
         return $this;
     }
 
+    public function addNewTask(array $data) : self
+    {
+        $this->code_work->addNewTask($data);
+        return $this;
+    }
+
+    public function deactivateTask(string $name) : self
+    {
+        $this->code_work->deactivateTask($name);
+        return $this;
+    }
+
+    public function reactivateTask(string $name) : self
+    {
+        $this->code_work->deactivateTask($name);
+        return $this;
+    }
+
     public function hasQuizzes() : bool
     {
         return $this->has_quizzes;
@@ -99,5 +117,10 @@ class AssessmentAggregate extends AggregateRoot
     public function getCodeWorkId() : string | null
     {
         return $this->code_work->getSourceCodeId();
+    }
+
+    public function getTasks() : array
+    {
+        return $this->code_work->getTasks();
     }
 }

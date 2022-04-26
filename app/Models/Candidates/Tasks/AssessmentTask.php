@@ -10,4 +10,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class AssessmentTask extends Model
 {
     use HasFactory, CrudTrait, SoftDeletes;
+
+    protected $fillable = ['assessment_id','task_name', 'task_description', 'required','active'];
 }

@@ -20,6 +20,7 @@ const postCssPlugins =[
 mix.js('resources/js/app.js', 'public/js').vue()
     .js('resources/js/baby-yoda.js', 'public/js').vue()
     .postCss('resources/css/app.css', 'public/css', postCssPlugins)
+    .postCss('resources/css/backpack.css', 'public/css', postCssPlugins)
     .sass('resources/sass/app.scss', 'public/sass')
     .webpackConfig(require('./webpack.config'))
     .sourceMaps();

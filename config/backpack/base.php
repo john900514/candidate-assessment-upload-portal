@@ -42,13 +42,13 @@ return [
 
     // CSS files that are loaded in all pages, using Laravel's asset() helper
     'styles' => [
-        'packages/backpack/base/css/bundle.css', // has primary color electric purple (backpack default)
-        // 'packages/backpack/base/css/blue-bundle.css', // has primary color blue
+        //'packages/backpack/base/css/bundle.css', // has primary color electric purple (backpack default)
+         'packages/backpack/base/css/blue-bundle.css', // has primary color blue
 
         // Here's what's inside the bundle:
         // 'packages/@digitallyhappy/backstrap/css/style.min.css',
         // 'packages/animate.css/animate.min.css',
-        // 'packages/noty/noty.css',
+        //'packages/noty/noty.css',
 
         // Load the fonts separately (so that you can replace them at will):
         'packages/source-sans-pro/source-sans-pro.css',
@@ -64,7 +64,7 @@ return [
 
     // CSS files that are loaded in all pages, using Laravel's mix() helper
     'mix_styles' => [ // file_path => manifest_directory_path
-         //'css/app.css' => '',
+         'sass/app.css' => '',
     ],
 
     // ------
