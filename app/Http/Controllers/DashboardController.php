@@ -43,7 +43,7 @@ class DashboardController extends Controller
                                 'body' => view('card-bodies.download-the-installer')->render()
                             ],
                             'class' => 'bg-info',
-                            'wrapper' => ['class' => 'col-6']
+                            'wrapper' => ['class' => 'col-md-6 not-sm pt-4']
 
                         ],
                         [
@@ -53,7 +53,7 @@ class DashboardController extends Controller
                                 'body' => view('card-bodies.applicants-todo-list', ['list' => $todo_list_data])->render()
                             ],
                             'class' => 'bg-secondary',
-                            'wrapper' => ['class' => 'col-6']
+                            'wrapper' => ['class' => 'col-md-6 col-sm-12 pt-4']
 
                         ],
                         [
@@ -63,7 +63,7 @@ class DashboardController extends Controller
                                 'body' => view('card-bodies.applicants-open-positions')->render()
                             ],
                             'class' => 'bg-success',
-                            'wrapper' => ['class' => 'col-6 pt-4']
+                            'wrapper' => ['class' => 'col-md-6 col-sm-12 pt-4']
 
                         ]
                     ]

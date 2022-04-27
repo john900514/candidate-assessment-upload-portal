@@ -6,6 +6,7 @@ use App\Aggregates\Candidates\JobPositionAggregate;
 use App\Aggregates\Users\UserAggregate;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AssessmentViewerController extends Controller
 {
@@ -35,5 +36,11 @@ class AssessmentViewerController extends Controller
         dd($available_assessments);
 
         return view('cms-custom-pages.candidates.assessments.assessment-dashboard', $data);
+    }
+
+    public function show(string $assessment_id)
+    {
+        $data = [];
+        return Inertia::render('Candidates/Assessments/AssessmentDashboard', $data);
     }
 }

@@ -95,6 +95,7 @@ class UserManagementCrudController extends CrudController
          * - CRUD::addColumn(['name' => 'price', 'type' => 'number']);
          */
         $this->crud->addButtonFromView('line','Resend Email','resend-welcome-email', 'beginning');
+        $this->crud->enableResponsiveTable();
     }
 
     /**
