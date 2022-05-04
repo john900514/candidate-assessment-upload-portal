@@ -12,6 +12,7 @@ enum UserRoleEnum : string
     case SENIOR_DEV      = 'Senior Developer';
     case DEV             = 'Developer';
     case JUNIOR_DEV      = 'Junior Developer';
+    case HR              = 'Human Resources';
     case FE_CANDIDATE    = 'Frontend Developer Candidate';
     case BE_CANDIDATE    = 'Backend Developer Applicant';
     case FS_CANDIDATE    = 'Full Stack Developer Applicant';

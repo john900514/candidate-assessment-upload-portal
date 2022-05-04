@@ -62,7 +62,7 @@ class ProjectSeeder extends Seeder
                 'client' => Client::getClientID('Shae Hair'),
             ],
             'Lave Shopify' => [
-                'client' => Client::getClientID('TruFit Athletic Clubs'),
+                'client' => Client::getClientID('Lave'),
             ],
             'Syrian Forum V2' => [
                 'client' => Client::getClientID('Syrian Forum USA'),

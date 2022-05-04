@@ -75,6 +75,14 @@ class UserSeeder extends Seeder
                 'role' => 'project_manager'
             ],
             [
+                'first_name' => 'Amy',
+                'last_name' => 'Howell',
+                'name' => 'amy',
+                'email' => 'amy@capeandbay.com',
+                'password' => bcrypt('Hello123!'),
+                'role' => 'hr'
+            ],
+            [
                 'first_name' => 'Developer',
                 'last_name' => 'Applicant',
                 'name' => 'jondoe',
@@ -89,9 +97,15 @@ class UserSeeder extends Seeder
             VarDumper::dump($dev['name']);
             $role = $dev['role'];
             unset($dev['role']);
-            UserAggregate::retrieve(Uuid::uuid4()->toString())
-                ->createUser($dev, $role)
-                ->persist();
+            $aggy = UserAggregate::retrieve(Uuid::uuid4()->toString())
+                ->createUser($dev, $role);
+
+            if($role != 'applicant')
+            {
+                $aggy = $aggy->verifyUser(date('Y-m-d H:i:s'));
+            }
+
+            $aggy->persist();
         }
     }
 }

@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.1",
         "backpack/crud": "^5.0",
+        "capeandbay-devs/clicks-ahoy": "dev-master",
         "goldspecdigital/laravel-eloquent-uuid": "^9.0",
         "guzzlehttp/guzzle": "^7.2",
         "inertiajs/inertia-laravel": "^0.5.4",
@@ -73,6 +74,10 @@
         "backpack/devtools": {
             "type": "composer",
             "url": "https://repo.backpackforlaravel.com"
+        },
+        "capeandbay-devs/clicks-ahoy" :{
+            "type": "path",
+            "url": "packages/capeandbay-devs/clicks-ahoy"
         }
     }
 }

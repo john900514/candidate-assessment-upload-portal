@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Candidate\ToDos\GetToDoList;
+use App\Actions\Users\Dashboards\DeptHeadDashboard;
+use App\Actions\Users\Dashboards\DevLeadDashboard;
+use App\Actions\Users\Dashboards\HRDashboard;
 use App\Aggregates\Users\UserAggregate;
 use Illuminate\Http\Request;
 
@@ -77,18 +80,39 @@ class DashboardController extends Controller
         }
         else
         {
-            // The default Empty State
-            $this->data['widgets'] = [
-                'before_content' => [
-                    [
-                        'type'        => 'jumbotron',
-                        'heading'     => 'Hi!',
-                        'content'     => "There's nothing here for you right now. Come back later!",
-                        'button_link' => backpack_url('logout'),
-                        'button_text' => 'Ok Bye.',
-                    ]
-                ]
-            ];
+            $role = $aggy->getRole();
+
+            switch($role)
+            {
+                case 'dept_head':
+                    $this->data['widgets']['before_content'] = [DeptHeadDashboard::run()];
+
+                    break;
+
+                case 'dev_lead':
+                    $this->data['widgets']['before_content'] = [DevLeadDashboard::run()];
+                    break;
+
+                case 'hr':
+                    $this->data['widgets']['before_content'] = [HRDashboard::run()];
+                    break;
+
+
+                default:
+                    // The default Empty State
+                    $this->data['widgets'] = [
+                        'before_content' => [
+                            [
+                                'type'        => 'jumbotron',
+                                'heading'     => 'Hi!',
+                                'content'     => "There's nothing here for you right now. Come back later!",
+                                'button_link' => backpack_url('logout'),
+                                'button_text' => 'Ok Bye.',
+                            ]
+                        ]
+                    ];
+            }
+
         }
 
         return view(backpack_view('dashboard'), $this->data);

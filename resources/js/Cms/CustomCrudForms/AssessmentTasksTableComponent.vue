@@ -1,5 +1,5 @@
 <template>
-    <table class="table table-responsive-sm table-striped">
+    <table class="table table-responsive-sm table-striped" id="assessment">
         <thead>
         <tr class="text-center">
             <th>Task</th>
