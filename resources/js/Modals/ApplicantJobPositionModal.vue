@@ -70,9 +70,8 @@ export default {
                 : 'Requirements not Completed'
         },
         readyToApply() {
-            let r = false;
-
-            return r;
+            console.log('Holy fucking shit', this.position);
+            return this.position.status === 'Ready to Apply';
         },
         assessmentData() {
             let r = [];

@@ -17,6 +17,7 @@ class CandidateProfilePartial extends AggregatePartial
 {
     protected string $candidate_status = 'unqualified-candidate';
     protected array $open_job_positions = [];
+    protected array $applied_for_job_positions = [];
 
     protected array $application_statuses = [];
     protected bool $has_submitted_resume = false;
@@ -143,6 +144,16 @@ class CandidateProfilePartial extends AggregatePartial
                     $this->application_statuses[$job_id]['assessments'][$assessment]['status'] = 'Completed';
                     $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-success';
                 }
+
+                // @todo - check the status of the application it self
+                $total_asses = count($this->application_statuses[$job_id]['assessments']);
+                $total_completed = 0;
+                foreach($this->application_statuses[$job_id]['assessments'] as $assessment)
+                {
+                    if($assessment['status'] == 'Completed') $total_completed++;
+                }
+
+                if($total_asses == $total_completed) $this->application_statuses[$job_id]['status'] = 'Ready to Apply';
             }
         }
     }

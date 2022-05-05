@@ -29,6 +29,7 @@ class FetchOpenJobs
                     $job_aggy = JobPositionAggregate::retrieve($open_id);
                     $assessments = $job_aggy->getAssessments();
                     $assessment_data = [];
+                    $completed_assessments = [];
 
                     foreach($assessments as $assessment)
                     {
@@ -47,7 +48,15 @@ class FetchOpenJobs
                                 'tasks' => count($ass_aggy->getTasks()),
                                 'source' => $ass_aggy->hasCodeWork() ? 'Yes' : 'No',
                             ];
+
+                            if($status == 'Completed') $completed_assessments[$assessment] = true;
                         }
+                    }
+                    $badge = 'badge-danger';
+                    $job_again = $aggy->getAssessmentStatus($open_id);
+                    if($job_again['status'] == 'Ready to Apply')
+                    {
+                        $badge = 'badge-warning';
                     }
                     /**
                      * STEPS.
@@ -58,8 +67,8 @@ class FetchOpenJobs
                     $results[] = [
                         'jobTitle' => $job_aggy->getJobTitle(),
                         'assessments' => count($assessments),
-                        'status' => 'Not Applied',
-                        'statusBadge' => 'badge-danger',
+                        'status' => $job_again['status'],
+                        'statusBadge' => $badge,
                         'desc' => $job_aggy->getDesc(),
                         'job_id' => $open_id,
                         'assessmentData' => $assessment_data
