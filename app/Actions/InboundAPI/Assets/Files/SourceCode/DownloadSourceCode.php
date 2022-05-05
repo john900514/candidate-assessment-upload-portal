@@ -41,13 +41,12 @@ class DownloadSourceCode
                                 $assessments[] = $assessment_id;
                             }
                         }
-
-
                     }
 
                     if(count($assessments) > 0)
                     {
                         $found = false;
+                        $assessments_to_marked_started = [];
                         // Foreach assessment get the ones with a source code requirement or fail with string
                         foreach ($assessments as $idx => $assessment)
                         {
@@ -59,8 +58,16 @@ class DownloadSourceCode
                                 {
                                     $record = SourceCodeUpload::whereId($code_id)
                                         ->whereFileId($source_code_id)->first();
-                                    $found = !is_null($record);
-                                    break;
+
+                                    if(!$found)
+                                    {
+                                        $found = !is_null($record);
+                                    }
+
+                                    if(!is_null($record))
+                                    {
+                                        $assessments_to_marked_started[] = $assessment;
+                                    }
                                 }
                             }
                         }
@@ -71,6 +78,24 @@ class DownloadSourceCode
                             if($url = $file_aggy->getTemporaryUrl())
                             {
                                 $results = ['url' => $url];
+                                if(count($assessments_to_marked_started) > 0)
+                                {
+                                    foreach ($jobs as $idx => $job_id)
+                                    {
+                                        foreach ($assessments_to_marked_started as $assessment_id)
+                                        {
+                                            if($ass_status = $aggy->getAssessmentStatus($job_id, $assessment_id))
+                                            {
+                                                if($ass_status['status'] == 'Not Started')
+                                                {
+                                                    $aggy = $aggy->updateJobAssessmentStatus($job_id, $assessment_id, 'Started');
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    $aggy->persist();
+                                }
                             }
                             else
                             {

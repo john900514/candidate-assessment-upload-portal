@@ -104,7 +104,7 @@ export default {
 </script>
 
 <style scoped>
-table {
+#assessment {
     width: 100% !important;
     table-layout: fixed;
     word-break: break-word;

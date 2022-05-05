@@ -6,5 +6,10 @@ use Spatie\EventSourcing\AggregateRoots\AggregatePartial;
 
 class AssessmentQuizPartial extends AggregatePartial
 {
-    protected array $quiz_ids = [];
+    protected array $quizzes = [];
+
+    public function getQuizzes() : array
+    {
+        return $this->quizzes;
+    }
 }

@@ -21,8 +21,6 @@ class UserRegistrationController extends Controller
 
             if(!$aggy->isUserVerified())
             {
-
-
                 backpack_auth()->login(User::find(request()->get('session')));
 
                 if($aggy->isEmployee())
@@ -37,6 +35,8 @@ class UserRegistrationController extends Controller
                     $payload = [
                         'role' => $role,
                         'email' => $aggy->getEmail(),
+                        'firstName' => $aggy->getFirstName(),
+                        'lastName' => $aggy->getLastName(),
                         'userId' => request()->get('session')
                     ];
 

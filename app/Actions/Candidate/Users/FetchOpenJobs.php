@@ -32,15 +32,22 @@ class FetchOpenJobs
 
                     foreach($assessments as $assessment)
                     {
-                        $ass_aggy = AssessmentAggregate::retrieve($assessment);
-                        $status = 'Not Started';
-                        $badge = 'badge-danger';
-                        $assessment_data[] = [
-                            'id' => $assessment,
-                            'name' => $ass_aggy->getName(),
-                            'status' => $status,
-                            'badge' => $badge
-                        ];
+                        $user_ass_status = $aggy->getAssessmentStatus($open_id, $assessment);
+                        if($user_ass_status)
+                        {
+                            $ass_aggy = AssessmentAggregate::retrieve($assessment);
+                            $status = $user_ass_status['status'];
+                            $badge = $user_ass_status['badge'];
+                            $assessment_data[] = [
+                                'id' => $assessment,
+                                'name' => $ass_aggy->getName(),
+                                'status' => $status,
+                                'badge' => $badge,
+                                'quizzes' => count($ass_aggy->getQuizzes()),
+                                'tasks' => count($ass_aggy->getTasks()),
+                                'source' => $ass_aggy->hasCodeWork() ? 'Yes' : 'No',
+                            ];
+                        }
                     }
                     /**
                      * STEPS.

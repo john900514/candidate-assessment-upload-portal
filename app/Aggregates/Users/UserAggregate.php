@@ -43,6 +43,7 @@ class UserAggregate extends AggregateRoot
         $this->last_name = $event->details['last_name'];
         $this->email = $event->details['email'];
         $this->role  = $event->role;
+
     }
     public function applyUserUpdated(UserUpdated $event)
     {
@@ -59,6 +60,7 @@ class UserAggregate extends AggregateRoot
     public function applyApplicantCreated(ApplicantCreated $event)
     {
         $this->first_name = $event->details['first_name'];
+        $this->last_name = $event->details['last_name'];
         $this->email = $event->details['email'];
         $this->role  = $event->role;
     }
@@ -163,6 +165,12 @@ class UserAggregate extends AggregateRoot
         return $this;
     }
 
+    public function updateJobAssessmentStatus(string $job_id, string $assessment_id, string $status, array $misc = []) : self
+    {
+        $this->candidate_profile->updateJobAssessmentStatus( $job_id,  $assessment_id,  $status, $misc);
+        return $this;
+    }
+
     public function getAccessToken() : string | false
     {
         return $this->access_token->getAccessToken();
@@ -176,6 +184,11 @@ class UserAggregate extends AggregateRoot
     public function getFirstName() : string|null
     {
         return $this->first_name;
+    }
+
+    public function getLastName() : string|null
+    {
+        return $this->last_name;
     }
 
     public function getEmail() : string|null
@@ -216,4 +229,9 @@ class UserAggregate extends AggregateRoot
     {
         return $this->activity->hasDownloadedInstaller();
     }
+    public function getAssessmentStatus(string $job_id, string|null $assessment_id = null) : false|array
+    {
+        return $this->candidate_profile->getAssessmentStatus($job_id, $assessment_id);
+    }
+
 }

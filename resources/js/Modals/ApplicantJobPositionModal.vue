@@ -30,9 +30,9 @@
                             <tr v-for="(assessment, idx) in assessmentData">
                                 <td>{{ assessment.name }}</td>
                                 <td><span class="badge" :class="assessment.badge">{{ assessment.status }}</span></td>
-                                <td class="not-sm">0</td>
-                                <td class="not-sm">0</td>
-                                <td class="not-sm">No</td>
+                                <td class="not-sm">{{ assessment.quizzes }}</td>
+                                <td class="not-sm">{{ assessment.tasks }}</td>
+                                <td class="not-sm">{{ assessment.source }}</td>
                                 <td><button class="badge badge-info" @click="viewAssessment(assessment.id)">Open</button></td>
                             </tr>
                         </tbody>

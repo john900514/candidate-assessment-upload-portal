@@ -3,6 +3,8 @@
 namespace App\Projectors\Candidates;
 
 use App\Models\Candidates\JobPosition;
+use App\Models\UserDetails;
+use App\StorableEvents\Candidates\Assessments\CandidateJobAssessmentStatusUpdated;
 use App\StorableEvents\Candidates\AssessmentsAddedOrUpdatedToJobPosition;
 use App\StorableEvents\Candidates\JobDescription;
 use App\StorableEvents\Candidates\JobPositionCreated;
@@ -38,6 +40,21 @@ class CandidateProjector extends Projector
             'concentration' => $event->config['concentration']['value'],
             'awarded_role' => $event->config['awarded_role']['value'],
             'active' => $event->config['active']
+        ]);
+    }
+
+    public function onCandidateJobAssessmentStatusUpdated(CandidateJobAssessmentStatusUpdated $event)
+    {
+        $misc = $event->details;
+        $misc['status'] = $event->new_status;
+        $misc['job_id'] = $event->job_id;
+
+        UserDetails::firstOrCreate([
+            'user_id' => $event->user_id,
+            'name' => 'assessment_status',
+            'value' => $event->assessment_id,
+            'misc' => $misc,
+            'active' => 1
         ]);
     }
 }

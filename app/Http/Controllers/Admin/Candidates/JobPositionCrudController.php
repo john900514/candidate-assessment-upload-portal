@@ -51,8 +51,8 @@ class JobPositionCrudController extends CrudController
                 $role = strtoupper($entry->concentration);
                 return JobTypeEnum::from($role)->name;
             });
-        CRUD::column('awarded_role')->label('Awarded Role')->type('text');
         CRUD::column('active')->label('Live?')->type('boolean');
+        CRUD::column('awarded_role')->label('Awarded Role')->type('text');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:

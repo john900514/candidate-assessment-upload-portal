@@ -40,7 +40,7 @@
                                 <div class="form-group mx-2">
                                     <label class="label cursor-pointer">
                                         <input type="checkbox" checked="checked" class="checkbox text-white" v-model="form['consent']">
-                                        <span class="label-text ml-4">Check this box saying you agree this account is for taking a test for qualifying for an interview and everything you see inside our service or submit is proprietary and property of Cape & Bay, LLC.</span>
+                                        <span class="label-text ml-4">Check this box saying you agree this account is for taking a test for qualifying for an interview and everything you see inside our service or submit is proprietary and property of Cape & Bay, LLC and are willing to sign a nondisclosure agreement in acknowledgement.</span>
                                     </label>
                                 </div>
                             </div>
@@ -65,13 +65,13 @@ export default {
     components: {
         BasicAssLayout
     },
-    props: ['role', 'email', 'userId'],
+    props: ['role', 'email', 'userId', 'firstName', 'lastName'],
     data() {
         return {
             form: {
                 email: this.email,
-                'first_name': '',
-                'last_name': '',
+                'first_name': this.firstName,
+                'last_name': this.lastName,
                 password: '',
                 consent: false,
             },

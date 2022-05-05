@@ -24,8 +24,8 @@ class JobPositionAggregate extends AggregateRoot
     public function applyJobPositionCreated(JobPositionCreated $event)
     {
         $this->job_title = $event->config['position'];
-        $this->job_type = $event->config['concentration']->value;
-        $this->awarded_role = $event->config['awarded_role']->value;
+        $this->job_type = $event->config['concentration']->value ?? $event->config['concentration']['value'];
+        $this->awarded_role = $event->config['awarded_role']->value ?? $event->config['awarded_role']['value'];
     }
 
     public function applyQualifiedRoleAdded(QualifiedRoleAdded $event)
@@ -36,8 +36,8 @@ class JobPositionAggregate extends AggregateRoot
     public function applyJobPositionUpdated(JobPositionUpdated $event)
     {
         $this->job_title = $event->config['position'];
-        $this->job_type = $event->config['concentration']['value'] ?? $event->config['concentration']->value;
-        $this->awarded_role = $event->config['awarded_role']['value'] ?? $event->config['awarded_role']->value;
+        $this->job_type = $event->config['concentration']->value ?? $event->config['concentration']['value'];
+        $this->awarded_role = $event->config['awarded_role']->value ?? $event->config['awarded_role']['value'];
         $this->active = $event->config['active'];
     }
 

@@ -40,7 +40,11 @@ class GetUserScopedAvailableSourceCodes
                             {
                                 if(!array_key_exists($assessment_id, $assessments))
                                 {
-                                    $assessments[$assessment_id] = $assessment_id;
+                                    $user_ass_status = $aggy->getAssessmentStatus($job_id, $assessment_id);
+                                    if($user_ass_status['status'] == 'Not Started')
+                                    {
+                                        $assessments[$assessment_id] = $assessment_id;
+                                    }
                                 }
                             }
                         }

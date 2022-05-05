@@ -42,7 +42,12 @@ class SourceCodeCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::setFromDb(); // columns
+
+        CRUD::column('file_nickname')->type('text');
+        CRUD::column('active')->type('boolean');
+        CRUD::column('description')->type('text');
+
+
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:

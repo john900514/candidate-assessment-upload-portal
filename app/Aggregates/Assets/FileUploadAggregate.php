@@ -30,7 +30,7 @@ class FileUploadAggregate extends AggregateRoot
         }
 
         $upload_payload = [
-            'file_path' => $path,
+            'file_path' => '/candidate_assessment/source_code/'.$path,
             'entity_id' => $source_id,
             'entity'    => SourceCodeUpload::class,
             'active'    => 1

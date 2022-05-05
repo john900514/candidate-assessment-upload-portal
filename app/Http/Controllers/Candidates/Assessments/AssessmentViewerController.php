@@ -33,7 +33,7 @@ class AssessmentViewerController extends Controller
             }
         }
 
-        dd($available_assessments);
+
 
         return view('cms-custom-pages.candidates.assessments.assessment-dashboard', $data);
     }

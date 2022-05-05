@@ -116,6 +116,9 @@ class UserManagementCrudController extends CrudController
         if($status == 'candidate')
         {
             CRUD::field('email');
+            CRUD::field('first_name')->wrapper(['class' => 'col-sm-12 col-md-6']);
+            CRUD::field('last_name')->wrapper(['class' => 'col-sm-12 col-md-6']);
+            CRUD::field('email');
 
             $roles = [
                 'FE_CANDIDATE'   => 'Frontend Applicant',
