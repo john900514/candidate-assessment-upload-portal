@@ -16,7 +16,20 @@ class DownloadInstallerAction
             ->downloadSourceCodeInstaller()
             ->persist();
 
-        $object_path = 'candidate_assessment/installer/installer.zip';
+        switch(env('APP_ENV'))
+        {
+            case 'production':
+                $object_path = 'candidate_assessment/installer/installer.zip';
+                break;
+
+            case 'develop':
+                $object_path = 'candidate_assessment/installer/installer_alpha.zip';
+                break;
+
+            default:
+                $object_path = 'candidate_assessment/installer/installer_dev.zip';
+        }
+
         $url = Storage::disk('s3')->temporaryUrl($object_path, now()->addMinutes(10));
         return redirect($url);
     }
