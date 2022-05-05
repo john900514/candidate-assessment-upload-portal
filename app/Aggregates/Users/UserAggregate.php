@@ -171,6 +171,12 @@ class UserAggregate extends AggregateRoot
         return $this;
     }
 
+    public function submitSourceCodeUpload(string $file_upload_id, string $file_upload_date, string $path, string $assessment_id) : self
+    {
+        $this->candidate_profile->submitSourceCodeUpload($file_upload_id, $file_upload_date, $path, $assessment_id);
+        return $this;
+    }
+
     public function getAccessToken() : string | false
     {
         return $this->access_token->getAccessToken();

@@ -2,13 +2,16 @@
 
 namespace App\Aggregates\Users\Partials;
 
+use App\StorableEvents\Candidates\Assessments\SourceCodeSubmittedForAssessment;
 use App\StorableEvents\Users\Activity\Email\UserSentWelcomeEmail;
 use App\StorableEvents\Users\Activity\Files\UserDownloadedSourceCodeInstaller;
+use App\StorableEvents\Users\Applicants\ApplicantUploadedResume;
 use Spatie\EventSourcing\AggregateRoots\AggregatePartial;
 
 class UserActivityPartial extends AggregatePartial
 {
     protected array $files_downloaded = [];
+    protected array $files_uploaded = [];
     protected array $activity = [];
     protected bool $installer_downloaded_before = false;
 
@@ -26,6 +29,16 @@ class UserActivityPartial extends AggregatePartial
     public function applyUserSentWelcomeEmail(UserSentWelcomeEmail $event)
     {
         $this->activity[] = 'Welcome email sent on '.$event->createdAt();
+    }
+
+    public function applyApplicantUploadedResume(ApplicantUploadedResume $event)
+    {
+        $this->files_uploaded['resume'] = $event->path;
+    }
+
+    public function applySourceCodeSubmittedForAssessment(SourceCodeSubmittedForAssessment $event)
+    {
+        $this->files_uploaded[$event->file_id] = $event->path;
     }
 
     public function downloadSourceCodeInstaller() : self

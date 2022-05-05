@@ -10,5 +10,5 @@ class UploadedFile extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['file_path', 'entity_id', 'entity', 'active'];
+    protected $fillable = ['id','file_path', 'entity_id', 'entity', 'active'];
 }

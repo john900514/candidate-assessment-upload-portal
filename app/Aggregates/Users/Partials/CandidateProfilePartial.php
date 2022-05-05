@@ -5,6 +5,7 @@ namespace App\Aggregates\Users\Partials;
 use App\Aggregates\Candidates\Assessments\AssessmentAggregate;
 use App\Aggregates\Candidates\JobPositionAggregate;
 use App\StorableEvents\Candidates\Assessments\CandidateJobAssessmentStatusUpdated;
+use App\StorableEvents\Candidates\Assessments\SourceCodeSubmittedForAssessment;
 use App\StorableEvents\Users\ApplicantCreated;
 use App\StorableEvents\Users\Applicants\ApplicantLinkedToJobPosition;
 use App\StorableEvents\Users\Applicants\ApplicantRoleChanged;
@@ -102,22 +103,30 @@ class CandidateProfilePartial extends AggregatePartial
                         $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-info';
                         break;
 
+                    case 'Completed':
+                        $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-success';
+                        break;
+
                     default:
-                        $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-dark';
+                        $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-warn';
                 }
 
                 if(array_key_exists('quizzesCompleted', $event->details))
                 {
-                    $total = $this->application_statuses[$job_id]['assessments'][$assessment]['quizzesCompleted'];
+                    /*
+                    $total = $this->application_statuses[$job_id]['assessments'][$assessment]['quizzesReqd'];
                     $total -= $event->details['quizzesCompleted'];
                     $this->application_statuses[$job_id]['assessments'][$assessment]['quizzesCompleted'] = $total;
+                    */
                 }
 
                 if(array_key_exists('tasksCompleted', $event->details))
                 {
+                    /*
                     $total = $this->application_statuses[$job_id]['assessments'][$assessment]['tasksCompleted'];
                     $total -= $event->details['tasksCompleted'];
                     $this->application_statuses[$job_id]['assessments'][$assessment]['tasksCompleted'] = $total;
+                    */
                 }
 
                 if(array_key_exists('sourceUploaded', $event->details))
@@ -125,7 +134,14 @@ class CandidateProfilePartial extends AggregatePartial
                     $this->application_statuses[$job_id]['assessments'][$assessment]['sourceUploaded'] = true;
                     $this->application_statuses[$job_id]['assessments'][$assessment]['sourceFileUploadId'] = $event->details['sourceFileUploadId'];
                     $this->application_statuses[$job_id]['assessments'][$assessment]['sourceFileUploadDate'] = $event->details['sourceFileUploadDate'];
+                }
 
+                // do a check on requirements to see if we can set the status to Completed actually!
+                $status_review = $this->application_statuses[$job_id]['assessments'][$assessment];
+                if($status_review['quizzesCompleted'] && $status_review['tasksCompleted'] && $status_review['sourceUploaded'])
+                {
+                    $this->application_statuses[$job_id]['assessments'][$assessment]['status'] = 'Completed';
+                    $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-success';
                 }
             }
         }
@@ -188,6 +204,12 @@ class CandidateProfilePartial extends AggregatePartial
     public function submitResume(string $path) : self
     {
         $this->recordThat(new ApplicantUploadedResume($this->aggregateRootUuid(), $path));
+        return $this;
+    }
+
+    public function submitSourceCodeUpload(string $file_upload_id, string $file_upload_date, string $path, string $assessment_id) : self
+    {
+        $this->recordThat(new SourceCodeSubmittedForAssessment($this->aggregateRootUuid(), $file_upload_id, $path, $file_upload_date, $assessment_id));
         return $this;
     }
 

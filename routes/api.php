@@ -37,6 +37,7 @@ Route::group(['middleware' => ['api', 'auth:sanctum']], function() {
     Route::group(['prefix' => 'candidates'], function() {
         Route::group(['prefix' => 'assessments'], function() {
             Route::get('/', \App\Actions\InboundAPI\Candidates\Assessments\GetUserScopedAvailableAssessments::class);
+            Route::post('/source-code', \App\Actions\InboundAPI\Candidates\Assessments\TriggerUserUploadedSourceCode::class);
         });
     });
 });

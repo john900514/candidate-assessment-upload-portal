@@ -2,9 +2,13 @@
 
 namespace App\Projectors\Candidates;
 
+use App\Models\Assets\UploadedFile;
+use App\Models\Assets\UserFileUpload;
 use App\Models\Candidates\JobPosition;
+use App\Models\User;
 use App\Models\UserDetails;
 use App\StorableEvents\Candidates\Assessments\CandidateJobAssessmentStatusUpdated;
+use App\StorableEvents\Candidates\Assessments\SourceCodeSubmittedForAssessment;
 use App\StorableEvents\Candidates\AssessmentsAddedOrUpdatedToJobPosition;
 use App\StorableEvents\Candidates\JobDescription;
 use App\StorableEvents\Candidates\JobPositionCreated;
@@ -55,6 +59,27 @@ class CandidateProjector extends Projector
             'value' => $event->assessment_id,
             'misc' => $misc,
             'active' => 1
+        ]);
+    }
+
+    public function onSourceCodeSubmittedForAssessment(SourceCodeSubmittedForAssessment $event)
+    {
+        $file_record = UploadedFile::firstOrCreate([
+            'file_path' => "{$event->path}{$event->assessment_id}.zip",
+            'entity_id' => $event->user_id,
+            'entity' => User::class,
+        ]);
+
+        if($file_record->id != $event->file_id)
+        {
+            $file_record->update(['id' => $event->file_id]);
+        }
+
+        UserFileUpload::create([
+           'user_id' => $event->user_id,
+            'file_id' => $event->file_id,
+            'file_nickname' => "Assessment {$event->assessment_id}",
+            'description' => 'User submitted source code for assessment on '.$event->date
         ]);
     }
 }

@@ -127,6 +127,19 @@ class JobPositionAggregate extends AggregateRoot
         return $results;
     }
 
+    public function confirmAssessment(string $assessment_id) : bool
+    {
+        $results = false;
+        foreach ($this->assessments as $assessment)
+        {
+            if($results = ($assessment == $assessment_id))
+            {
+                break;
+            }
+        }
+        return $results;
+    }
+
     public function getDesc() : string | null
     {
         return $this->description;
