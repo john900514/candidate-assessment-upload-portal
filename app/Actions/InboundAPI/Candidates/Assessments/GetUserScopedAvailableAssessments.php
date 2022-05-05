@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Actions\InboundAPI\Assets\Files\SourceCode;
+namespace App\Actions\InboundAPI\Candidates\Assessments;
 
 use App\Aggregates\Candidates\Assessments\AssessmentAggregate;
 use App\Aggregates\Candidates\JobPositionAggregate;
 use App\Aggregates\Users\UserAggregate;
-use App\Models\Assets\SourceCodeUpload;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class GetUserScopedAvailableSourceCodes
+class GetUserScopedAvailableAssessments
 {
     use AsAction;
 
@@ -34,6 +33,7 @@ class GetUserScopedAvailableSourceCodes
                         $job_aggy = JobPositionAggregate::retrieve($job_id);
 
                         $job_tests = $job_aggy->getAssessments();
+
                         if(count($job_tests) > 0)
                         {
                             foreach ($job_tests as $assessment_id)
@@ -41,68 +41,31 @@ class GetUserScopedAvailableSourceCodes
                                 if(!array_key_exists($assessment_id, $assessments))
                                 {
                                     $user_ass_status = $aggy->getAssessmentStatus($job_id, $assessment_id);
-                                    if($user_ass_status['status'] != 'Completed')
+                                    if(($user_ass_status['status'] != 'Not Started') && ($user_ass_status['status'] != 'Completed'))
                                     {
                                         $assessments[$assessment_id] = $assessment_id;
                                     }
                                 }
                             }
                         }
-
                     }
 
                     if(count($assessments) > 0)
                     {
-                        $source_codes = [];
-                        // Foreach assessment get the ones with a source code requirement or fail with string
+                        $results = [];
                         foreach ($assessments as $idx => $assessment)
                         {
                             $ass_aggy = AssessmentAggregate::retrieve($assessment);
-
-                            if($ass_aggy->hasCodeWork())
-                            {
-                                if($code_id = $ass_aggy->getCodeWorkId())
-                                {
-                                    if(!array_key_exists($code_id, $source_codes))
-                                    {
-                                        $source_codes[$code_id] = $code_id;
-                                    }
-                                }
-                            }
+                            $results[$assessment] = $ass_aggy->getName();
                         }
-
-                        // Curate responding payload and return
-                        if(count($source_codes) > 0)
-                        {
-                            $payload = [];
-                            foreach ($source_codes as $idx => $source_code_id)
-                            {
-                                $record = SourceCodeUpload::whereId($source_code_id)
-                                    ->with('file_record')->first();
-
-                                $payload[] = [
-                                    'file_id' => $record->file_record->id,
-                                    'file_name' => $record->file_nickname,
-                                ];
-                            }
-
-                            $results = $payload;
-                        }
-                        else
-                        {
-                            $results = 'No Source Codes Available.';
-                        }
-
                     }
-                    else
-                    {
-                        $results = 'A Job with a Source Code Assessment must be available for you to apply for.';
-                    }
+
                 }
                 else
                 {
                     $results = 'A Job with a Source Code Assessment must be available for you to apply for.';
                 }
+
             }
             else
             {
