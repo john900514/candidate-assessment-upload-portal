@@ -2,8 +2,11 @@
 
 namespace App\Aggregates\Candidates;
 
+use App\Aggregates\Users\UserAggregate;
 use App\Exceptions\Candidates\JobPositionException;
 use App\StorableEvents\Candidates\AssessmentsAddedOrUpdatedToJobPosition;
+use App\StorableEvents\Candidates\JobApplications\UsersJobApplicationWasReverted;
+use App\StorableEvents\Candidates\JobApplications\UserSubmittedJobApplication;
 use App\StorableEvents\Candidates\JobDescription;
 use App\StorableEvents\Candidates\JobPositionCreated;
 use App\StorableEvents\Candidates\JobPositionUpdated;
@@ -20,6 +23,9 @@ class JobPositionAggregate extends AggregateRoot
     protected array $assessments = [];
     protected array $qualified_roles = [];
     protected array $candidate_users = [];
+    protected array $rejected_candidate_users = [];
+    protected array $interview_candidate_users = [];
+    protected array $hired_users = [];
 
     public function applyJobPositionCreated(JobPositionCreated $event)
     {
@@ -68,6 +74,16 @@ class JobPositionAggregate extends AggregateRoot
         $this->description = $event->desc;
     }
 
+    public function applyUserSubmittedJobApplication(UserSubmittedJobApplication $event)
+    {
+        $this->candidate_users[$event->user_id] = $event->email;
+    }
+
+    public function applyUsersJobApplicationWasReverted(UsersJobApplicationWasReverted $event)
+    {
+        unset($this->candidate_users[$event->user_id]);
+    }
+
     public function createJobPosition(array $config) : self
     {
         if(!is_null($this->job_title))
@@ -110,6 +126,42 @@ class JobPositionAggregate extends AggregateRoot
     public function updateDescription(string $desc) : self
     {
         $this->recordThat(new JobDescription($this->uuid(), $desc));
+        return $this;
+    }
+
+    public function submitUserJobApplication(string $user_id, string $email) : self
+    {
+        if(array_key_exists($user_id, $this->candidate_users))
+        {
+            throw JobPositionException::userCannotBeAddedToCandidates('User is already a candidate.');
+        }
+        elseif(array_key_exists($user_id, $this->rejected_candidate_users))
+        {
+            throw JobPositionException::userCannotBeAddedToCandidates('User is was already rejected and cannot re-apply for this position.');
+        }
+        elseif(array_key_exists($user_id, $this->interview_candidate_users))
+        {
+            throw JobPositionException::userCannotBeAddedToCandidates('This candidate is already pending an interview for this position.');
+        }
+        elseif(array_key_exists($user_id, $this->hired_users))
+        {
+            throw JobPositionException::userCannotBeAddedToCandidates('Hired users cannot reapply. Please wait to be onboarded.');
+        }
+
+        $this->recordThat(new UserSubmittedJobApplication($this->uuid(), $user_id, $email));
+
+        return $this;
+    }
+
+    public function removeUserFromCandidates(string $user_id) : self
+    {
+        if(!array_key_exists($user_id, $this->candidate_users))
+        {
+            throw JobPositionException::userCannotBeRemovedFromCandidates('User is not in candidate list');
+        }
+
+        $this->recordThat(new UsersJobApplicationWasReverted($this->uuid(), $user_id));
+
         return $this;
     }
 

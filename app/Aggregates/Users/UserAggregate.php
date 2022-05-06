@@ -177,6 +177,12 @@ class UserAggregate extends AggregateRoot
         return $this;
     }
 
+    public function logJobApplication(string $job_id) : self
+    {
+        $this->candidate_profile->logJobApplication($job_id);
+        return $this;
+    }
+
     public function getAccessToken() : string | false
     {
         return $this->access_token->getAccessToken();

@@ -42,7 +42,7 @@
 
             <div class="card bg-blue col-sm-12 col-md-12">
                 <div class="card-body text-center row" id="controlPanel">
-                    <button type="button" class="btn btn-outline-success" :disabled="!readyToApply">{{ applyBtnText }}</button>
+                    <button type="button" class="btn btn-outline-success" :disabled="!readyToApply" @click="submitApplication()" v-if="position.status !== 'Applied'">{{ applyBtnText }}</button>
                     <button type="button" class="btn btn-danger" @click="closeModal()"> Close Modal </button>
                 </div>
             </div>
@@ -90,6 +90,37 @@ export default {
         },
         viewAssessment(id) {
             window.location.href = '/portal/assessments/'+id;
+        },
+        submitApplication() {
+            let payload = {
+                'job_id': this.position['job_id']
+            };
+            axios.post('/portal/candidates/submit-application', payload)
+                .then(({ data }) => {
+                    new Noty({
+                        theme: 'sunset',
+                        type: 'success',
+                        text: `You have successfully applied for the position! We will review your application and contact you to schedule an interview!`
+                    }).show();
+
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 2500)
+
+                })
+                .catch(({ response }) => {
+                    let r =  response.statusText;
+
+                    if(('data' in response) && ('message' in response.data)) {
+                        r = response.data.message;
+                    }
+                    console.log(response);
+                    new Noty({
+                        theme: 'sunset',
+                        type: 'error',
+                        text: `An Error occurred. ${r} Please Try Again`
+                    }).show();
+                })
         }
     },
 }

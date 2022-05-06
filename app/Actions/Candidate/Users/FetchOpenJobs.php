@@ -54,9 +54,15 @@ class FetchOpenJobs
                     }
                     $badge = 'badge-danger';
                     $job_again = $aggy->getAssessmentStatus($open_id);
-                    if($job_again['status'] == 'Ready to Apply')
+                    switch($job_again['status'])
                     {
-                        $badge = 'badge-warning';
+                        case 'Ready to Apply':
+                            $badge = 'badge-warning';
+                            break;
+
+                        case 'Applied':
+                            $badge = 'badge-success';
+                            break;
                     }
                     /**
                      * STEPS.

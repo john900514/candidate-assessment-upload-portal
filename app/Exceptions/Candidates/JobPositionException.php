@@ -30,4 +30,9 @@ class JobPositionException extends DomainException
     {
         return new self($why);
     }
+
+    public static function userCannotBeRemovedFromCandidates(string $why) : self
+    {
+        return new self($why);
+    }
 }

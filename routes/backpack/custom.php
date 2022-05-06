@@ -19,6 +19,7 @@ Route::group([
     Route::post('assets/download-installer', 'Assets\DownloadInstallerAction')->name('download-installer');
     Route::post('users/{user_id}/resend-email', 'Users\Auth\ResendWelcomeEmail')->name('user.resend-email');
     Route::get('candidates/user-open-jobs', 'Candidate\Users\FetchOpenJobs');
+    Route::post('candidates/submit-application', 'Candidate\Jobs\SubmitJobApplication');
 
     Route::post('assessments/tasks', 'Candidate\Assessments\Tasks\CreateNewTask');
     Route::put('assessments/tasks', 'Candidate\Assessments\Tasks\ReactivateTask');

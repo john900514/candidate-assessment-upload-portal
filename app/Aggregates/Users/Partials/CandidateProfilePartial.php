@@ -4,11 +4,13 @@ namespace App\Aggregates\Users\Partials;
 
 use App\Aggregates\Candidates\Assessments\AssessmentAggregate;
 use App\Aggregates\Candidates\JobPositionAggregate;
+use App\Exceptions\Candidates\JobPositionException;
 use App\StorableEvents\Candidates\Assessments\CandidateJobAssessmentStatusUpdated;
 use App\StorableEvents\Candidates\Assessments\SourceCodeSubmittedForAssessment;
 use App\StorableEvents\Users\ApplicantCreated;
 use App\StorableEvents\Users\Applicants\ApplicantLinkedToJobPosition;
 use App\StorableEvents\Users\Applicants\ApplicantRoleChanged;
+use App\StorableEvents\Users\Applicants\ApplicantSubmittedJobApplication;
 use App\StorableEvents\Users\Applicants\ApplicantUploadedResume;
 use App\StorableEvents\Users\UserCreated;
 use Spatie\EventSourcing\AggregateRoots\AggregatePartial;
@@ -200,6 +202,12 @@ class CandidateProfilePartial extends AggregatePartial
         $this->resume_path = $event->path;
     }
 
+    public function applyApplicantSubmittedJobApplication(ApplicantSubmittedJobApplication $event)
+    {
+        $this->application_statuses[$event->job_id]['status'] = 'Applied';
+        $this->applied_for_job_positions[$event->job_id] = $this->application_statuses[$event->job_id];
+    }
+
     public function updateCandidateRole(string $role) : self
     {
         $this->recordThat(new ApplicantRoleChanged($this->aggregateRootUuid(), $role));
@@ -227,6 +235,29 @@ class CandidateProfilePartial extends AggregatePartial
     public function updateJobAssessmentStatus(string $job_id, string $assessment_id, string $status, array $misc = []) : self
     {
         $this->recordThat(new CandidateJobAssessmentStatusUpdated($this->aggregateRootUuid(), $job_id, $assessment_id, $status, $misc));
+        return $this;
+    }
+
+    public function logJobApplication(string $job_id) : self
+    {
+        $found = false;
+        foreach ($this->open_job_positions as $idx => $job_uuid)
+        {
+            if($found = ($job_id == $job_uuid))
+            {
+                break;
+            }
+        }
+
+        if(!$found)
+        {
+            // remove the user from the list of job Candidates before throwing exception
+            JobPositionAggregate::retrieve($job_id)->removeUserFromCandidates($this->aggregateRootUuid())->persist();
+            throw JobPositionException::userCannotBeAddedToCandidates('This job is not available for this user to Apply to.');
+        }
+
+        $this->recordThat(new ApplicantSubmittedJobApplication($this->aggregateRootUuid(), $job_id, date('Y-m-d H:i:s')));
+
         return $this;
     }
 
