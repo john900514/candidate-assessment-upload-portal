@@ -12,7 +12,6 @@ class JobApplicationReactor extends Reactor implements ShouldQueue
     {
         /**
          * STEPS
-         * 1. Make a mailing list DB table, migration, model and aggregate
          * 2. Make a seeder that makes new mailing lists and adds users to them
          * 3. Get the Job Aggregate - get the job type
          * 4. Query the DB for the UUID of the mailing list of that job position
