@@ -3,6 +3,7 @@
 namespace App\Aggregates\Users\Partials;
 
 use App\StorableEvents\Candidates\Assessments\SourceCodeSubmittedForAssessment;
+use App\StorableEvents\Users\Activity\Email\EmailNeedsToBeFired;
 use App\StorableEvents\Users\Activity\Email\UserSentWelcomeEmail;
 use App\StorableEvents\Users\Activity\Files\UserDownloadedSourceCodeInstaller;
 use App\StorableEvents\Users\Applicants\ApplicantUploadedResume;
@@ -41,6 +42,11 @@ class UserActivityPartial extends AggregatePartial
         $this->files_uploaded[$event->file_id] = $event->path;
     }
 
+    public function applyEmailNeedsToBeFired(EmailNeedsToBeFired $event)
+    {
+        $this->activity[] = $event->mail_class.' fired out to user on '.$event->date;
+    }
+
     public function downloadSourceCodeInstaller() : self
     {
         $date = date('Y-m-d H:i:s');
@@ -51,6 +57,13 @@ class UserActivityPartial extends AggregatePartial
     public function sendWelcomeEmail(string $status) : self
     {
         $this->recordThat(new UserSentWelcomeEmail($this->aggregateRootUuid(), $status));
+        return $this;
+    }
+
+    public function fireEmailToThisUser(string $mail_class, array $payload) : self
+    {
+        $date = date('Y-m-d H:i:s');
+        $this->recordThat(new EmailNeedsToBeFired($this->aggregateRootUuid(), $mail_class, $payload, $date));
         return $this;
     }
 

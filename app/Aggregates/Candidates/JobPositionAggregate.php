@@ -4,6 +4,7 @@ namespace App\Aggregates\Candidates;
 
 use App\Aggregates\Users\UserAggregate;
 use App\Exceptions\Candidates\JobPositionException;
+use App\Models\Communication\MailingList;
 use App\StorableEvents\Candidates\AssessmentsAddedOrUpdatedToJobPosition;
 use App\StorableEvents\Candidates\JobApplications\UsersJobApplicationWasReverted;
 use App\StorableEvents\Candidates\JobApplications\UserSubmittedJobApplication;
@@ -200,5 +201,24 @@ class JobPositionAggregate extends AggregateRoot
     public function getJobTitle() : string | null
     {
         return $this->job_title;
+    }
+
+    public function getConcentration() : string | null
+    {
+        return $this->job_type;
+    }
+
+    public function getAssociatedMailingLists() : array
+    {
+        $results = [];
+
+        $lists_models = MailingList::whereConcentration($this->job_type)->get();
+
+        if(count($lists_models) > 0)
+        {
+            $results = $lists_models->toArray();
+        }
+
+        return $results;
     }
 }

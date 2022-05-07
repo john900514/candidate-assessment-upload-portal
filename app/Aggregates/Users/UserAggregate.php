@@ -183,6 +183,12 @@ class UserAggregate extends AggregateRoot
         return $this;
     }
 
+    public function fireEmailToThisUser(string $mail_class, array $payload) : self
+    {
+        $this->activity->fireEmailToThisUser($mail_class, $payload);
+        return $this;
+    }
+
     public function getAccessToken() : string | false
     {
         return $this->access_token->getAccessToken();
