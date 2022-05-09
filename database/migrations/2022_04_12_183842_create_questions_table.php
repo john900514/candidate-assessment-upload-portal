@@ -19,8 +19,7 @@ return new class extends Migration
             $table->string('question_name');
             $table->string('question_type');
             $table->string('answer')->nullable();
-            $table->string('concentration')->nullable();
-            $table->string('job_position_id')->nullable();
+            $table->longText('available_choices')->nullable();
             $table->integer('order')->default(0);
             $table->boolean('active')->default(1);
             $table->timestamps();

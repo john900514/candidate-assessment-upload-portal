@@ -110,17 +110,89 @@ class QuizCrudController extends CrudController
     {
         $this->setupCreateOperation();
 
+        $this->crud->field('active')->type('boolean')
+            ->wrapper(['class'=> 'pt-4 col-12'])
+            ->hint('Question(s) must be added before Activating');
+
         $aggy = QuizAggregate::retrieve($this->crud->getCurrentEntryId());
 
         $tasks = $aggy->getQuestions();
         $this->crud->field('table_of_tasks')->type('view')
-            ->view('card-bodies.assessment-tasks-table')->value($tasks)
+            ->view('card-bodies.quiz-questions-table')->value($tasks)
             ->tab('Questions');
     }
 
     public function update()
     {
         $data = request()->all();
+
+        $aggy = QuizAggregate::retrieve($this->crud->getCurrentEntryId());
+
+        $valid = true;
+        if(array_key_exists('active', $data) && $data['active'] == '1')
+        {
+            // Check if there are questions already, or fail if active is true
+            if(count($aggy->getQuestions()) == 0)
+            {
+                \Alert::add('error', 'Questions have to be added before activating the quiz!', )->flash();
+                $valid = false;
+            }
+            else
+            {
+                if(!$aggy->isActive())
+                {
+                    $aggy = $aggy->activateQuiz();
+                    \Alert::add('success', 'Quiz Activated.', )->flash();
+                }
+            }
+        }
+
+        if($valid)
+        {
+            if(empty($data['name']))
+            {
+                \Alert::add('error', 'Quiz Name cannot be empty!', )->flash();
+                $valid = false;
+            }
+            elseif($aggy->getName() != $data['name'])
+            {
+                $aggy = $aggy->updateQuizName($data['name']);
+                \Alert::add('success', 'Quiz name changed.', )->flash();
+            }
+
+            if($valid)
+            {
+                if(empty($data['concentration']))
+                {
+                    \Alert::add('error', 'The quiz needs a concentration!', )->flash();
+                    $valid = false;
+                }
+                elseif($aggy->getConcentration() != $data['concentration'])
+                {
+                    $aggy = $aggy->updateConcentration($data['concentration']);
+                    \Alert::add('success', 'Quiz concentration changed.', )->flash();
+                }
+
+                if($aggy->isActive() && (array_key_exists('active', $data) && $data['active'] == '0'))
+                {
+                    $aggy = $aggy->deactivateQuiz();
+                    \Alert::add('success', 'Quiz Deactivated.', )->flash();
+                }
+            }
+        }
+
+        if($valid)
+        {
+            $aggy->persist();
+            \Alert::add('success', 'Quiz successfully Updated!!', )->flash();
+
+        }
+        /**
+         * STEPS
+         * 1.
+         * 2. Use the aggregate to update the name concentration
+         * 3. Try and catch QuizExceptions
+         */
 
 
         $this->crud->setSaveAction();

@@ -17,6 +17,9 @@ Route::group([
 ], function () { // custom admin routes
     Route::post('edit-account-info/access-token', 'Users\Auth\AccessToken')->name('backpack.account.access-token');
     Route::post('assets/download-installer', 'Assets\DownloadInstallerAction')->name('download-installer');
+
+    Route::post('assets/quizzes/{quiz_id}/questions', 'Assets\Tests\CreateNewQuizQuestion');
+
     Route::post('users/{user_id}/resend-email', 'Users\Auth\ResendWelcomeEmail')->name('user.resend-email');
     Route::get('candidates/user-open-jobs', 'Candidate\Users\FetchOpenJobs');
     Route::post('candidates/submit-application', 'Candidate\Jobs\SubmitJobApplication');

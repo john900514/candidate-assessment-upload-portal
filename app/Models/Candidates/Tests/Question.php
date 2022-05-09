@@ -9,4 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Question extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $fillable = ['id', 'quiz_id','question_name', 'question_type', 'available_choices', 'answer', 'order', 'active'];
+
+    protected $casts = [
+        'available_choices' => 'array'
+    ];
 }

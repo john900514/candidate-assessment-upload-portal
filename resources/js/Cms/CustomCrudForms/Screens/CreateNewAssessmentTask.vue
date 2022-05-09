@@ -52,6 +52,7 @@ export default {
             for(let x in this.form) {
                 if(this.form[x] === '') {
                     new Noty({
+                        theme: 'sunset',
                         type: 'warning',
                         text: x+' needs to be filled out first!'
                     }).show()
@@ -76,7 +77,7 @@ export default {
 
                     setTimeout(function () {
                         _this.$emit('reload');
-                    }, 7500);
+                    }, 750);
                 })
                 .catch(({ response }) => {
                     new Noty({
