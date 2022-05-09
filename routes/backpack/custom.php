@@ -55,4 +55,5 @@ Route::group([
     Route::crud('candidates/job-positions', 'Candidates\JobPositionCrudController');
     Route::crud('candidates/assessments', 'Candidates\AssessmentCrudController');
     Route::crud('assets/source-code', 'Assets\SourceCodeCrudController');
+    Route::crud('assets/quizzes', 'Assets\QuizCrudController');
 });// this should be the absolute last line of this file

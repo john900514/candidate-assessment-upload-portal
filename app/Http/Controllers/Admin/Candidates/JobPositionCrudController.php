@@ -11,6 +11,7 @@ use App\Models\Candidates\Assessment;
 use App\Models\Candidates\Tests\Quiz;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Class JobPositionCrudController
@@ -20,7 +21,7 @@ use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 class JobPositionCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation  { store as traitStore; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation  { update as traitUpdate; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
@@ -71,12 +72,97 @@ class JobPositionCrudController extends CrudController
     {
         CRUD::setValidation(JobPositionRequest::class);
 
+        $this->crud->field('job_title')->attributes(['required' => 'required'])
+            ->wrapper(['class' => 'col-6']);
+
+        $job_types = [];
+        foreach(collect(JobTypeEnum::cases()) as $enum)
+        {
+            $job_types[$enum->value] = $enum->name;
+        }
+
+        $this->crud->field('concentration')->type('select_from_array')
+            ->options($job_types)->wrapper(['class' => 'col-6']);
+
+        $this->crud->field('concentration')->type('select_from_array')
+            ->options($job_types)->wrapper(['class' => 'col-6']);
+
+        $this->crud->field('description')->type('textarea')
+            ->value('');
+
+        $roles = [];
+        foreach(collect(UserRoleEnum::cases()) as $enum)
+        {
+            $roles[$enum->value] = $enum->name;
+        }
+        $this->crud->field('awarded_role')->attributes(['required' => 'required'])
+            ->type('select_from_array')->options($roles)
+            ->wrapper(['class' => 'col-12']);
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
          * - CRUD::field('price')->type('number');
          * - CRUD::addField(['name' => 'price', 'type' => 'number']));
          */
+    }
+
+    public function store()
+    {
+        $data = request()->all();
+        $uuid = Uuid::uuid4()->toString();
+
+        $payload = [
+            'position' => $data['job_title'],
+            'concentration' => $data['concentration'],
+            'awarded_role' => $data['awarded_role'],
+        ];
+
+        switch($data['concentration'])
+        {
+            case 1:
+            case '1':
+                $payload['candidates'] = [
+                    UserRoleEnum::BE_CANDIDATE
+                ];
+                break;
+
+            case 2:
+            case '2':
+                $payload['candidates'] = [
+                    UserRoleEnum::FE_CANDIDATE
+                ];
+                break;
+
+            case 3:
+            case '3':
+                $payload['candidates'] = [
+                    UserRoleEnum::FS_CANDIDATE
+                ];
+                break;
+
+            case 7:
+            case '7':
+                $payload['candidates'] = [
+                    UserRoleEnum::FS_CANDIDATE,
+                    UserRoleEnum::FE_CANDIDATE
+                ];
+                break;
+        }
+
+        $aggy = JobPositionAggregate::retrieve($uuid)
+            ->createJobPosition($payload);
+
+        $candidates = $payload['candidates'];
+
+        foreach ($candidates as $candidate)
+        {
+            $aggy = $aggy->addQualifiedRole($candidate->value);
+        }
+
+        $aggy->persist();
+
+        $this->crud->setSaveAction();
+        return $this->crud->performSaveAction($uuid);
     }
 
     /**

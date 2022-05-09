@@ -73,7 +73,8 @@ class JobPositionSeeder extends Seeder
                 'concentration' =>  JobTypeEnum::SPECIALIST,
                 'awarded_role' => UserRoleEnum::DEV,
                 'candidates' => [
-                    UserRoleEnum::FE_CANDIDATE
+                    UserRoleEnum::FE_CANDIDATE,
+                    UserRoleEnum::FS_CANDIDATE,
                 ],
             ],
             [

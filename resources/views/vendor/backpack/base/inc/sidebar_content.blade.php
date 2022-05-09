@@ -23,6 +23,7 @@
 
 @if($user->can('create_quiz_questions'))
     <li class='nav-item'><a class='nav-link' href='{{ backpack_url('assets/source-code') }}'><i class="las la-laptop-code"></i> Source Code</a></li>
+    <li class='nav-item'><a class='nav-link' href='{{ backpack_url('assets/quizzes') }}'><i class='nav-icon las la-school'></i>Quizzes</a></li>
 @endif
 
 @if($user_aggy->isApplicant())

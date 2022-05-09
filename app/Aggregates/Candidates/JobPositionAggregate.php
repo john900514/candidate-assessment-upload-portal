@@ -31,8 +31,8 @@ class JobPositionAggregate extends AggregateRoot
     public function applyJobPositionCreated(JobPositionCreated $event)
     {
         $this->job_title = $event->config['position'];
-        $this->job_type = $event->config['concentration']->value ?? $event->config['concentration']['value'];
-        $this->awarded_role = $event->config['awarded_role']->value ?? $event->config['awarded_role']['value'];
+        $this->job_type = $event->config['concentration']['value'] ?? $event->config['concentration']->value ?? $event->config['concentration'];
+        $this->awarded_role = $event->config['awarded_role']['value'] ?? $event->config['awarded_role']->value ?? $event->config['awarded_role'];
     }
 
     public function applyQualifiedRoleAdded(QualifiedRoleAdded $event)
@@ -43,15 +43,16 @@ class JobPositionAggregate extends AggregateRoot
     public function applyJobPositionUpdated(JobPositionUpdated $event)
     {
         $this->job_title = $event->config['position'];
-        $this->job_type = $event->config['concentration']->value ?? $event->config['concentration']['value'];
-        $this->awarded_role = $event->config['awarded_role']->value ?? $event->config['awarded_role']['value'];
+        $this->job_type = $event->config['concentration']['value'] ?? $event->config['concentration']->value ?? $event->config['concentration'];
+        $this->awarded_role = $event->config['awarded_role']['value'] ?? $event->config['awarded_role']->value ?? $event->config['awarded_role'];
         $this->active = $event->config['active'];
     }
 
     public function applyAssessmentsAddedOrUpdatedToJobPosition(AssessmentsAddedOrUpdatedToJobPosition $event)
     {
-        //$this->assessments = $event->assessments;
+        $this->assessments = $event->assessments;
 
+        /*
         foreach ($event->assessments as $assessment)
         {
             $exists_already = false;
@@ -68,6 +69,7 @@ class JobPositionAggregate extends AggregateRoot
                 $this->assessments[] = $assessment;
             }
         }
+        */
     }
 
     public function applyJobDescription(JobDescription $event)

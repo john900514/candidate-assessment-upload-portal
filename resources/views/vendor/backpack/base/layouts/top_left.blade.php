@@ -25,7 +25,7 @@
 
        @yield('header')
 
-        <div class="container-fluid animated fadeIn row mt-2">
+        <div class="container-fluid animated fadeIn mt-2">
 
           @yield('before_content_widgets')
 
