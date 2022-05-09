@@ -40,34 +40,40 @@ class DashboardController extends Controller
                 $this->data['widgets'] = [
                     'before_content' => [
                         [
-                            'type'        => 'card',
+                            'type'    => 'div',
+                            'class'   => 'row',
                             'content' => [
-                                'header' => 'Download the Installer',
-                                'body' => view('card-bodies.download-the-installer')->render()
-                            ],
-                            'class' => 'bg-info',
-                            'wrapper' => ['class' => 'col-md-6 not-sm pt-4']
+                                [
+                                    'type'        => 'card',
+                                    'content' => [
+                                        'header' => 'Download the Installer',
+                                        'body' => view('card-bodies.download-the-installer')->render()
+                                    ],
+                                    'class' => 'bg-info',
+                                    'wrapper' => ['class' => 'col-md-6 not-sm pt-4']
 
-                        ],
-                        [
-                            'type'        => 'card',
-                            'content' => [
-                                'header' => 'Your ToDo List',
-                                'body' => view('card-bodies.applicants-todo-list', ['list' => $todo_list_data])->render()
-                            ],
-                            'class' => 'bg-secondary',
-                            'wrapper' => ['class' => 'col-md-6 col-sm-12 pt-4']
+                                ],
+                                [
+                                    'type'        => 'card',
+                                    'content' => [
+                                        'header' => 'Your ToDo List',
+                                        'body' => view('card-bodies.applicants-todo-list', ['list' => $todo_list_data])->render()
+                                    ],
+                                    'class' => 'bg-secondary',
+                                    'wrapper' => ['class' => 'col-md-6 col-sm-12 pt-4']
 
-                        ],
-                        [
-                            'type'        => 'card',
-                            'content' => [
-                                'header' => $aggy->getFirstName()."'s Open Positions",
-                                'body' => view('card-bodies.applicants-open-positions')->render()
-                            ],
-                            'class' => 'bg-success',
-                            'wrapper' => ['class' => 'col-md-6 col-sm-12 pt-4']
+                                ],
+                                [
+                                    'type'        => 'card',
+                                    'content' => [
+                                        'header' => $aggy->getFirstName()."'s Open Positions",
+                                        'body' => view('card-bodies.applicants-open-positions')->render()
+                                    ],
+                                    'class' => 'bg-success',
+                                    'wrapper' => ['class' => 'col-md-12 col-sm-12 pt-4']
 
+                                ]
+                            ]
                         ]
                     ]
                 ];

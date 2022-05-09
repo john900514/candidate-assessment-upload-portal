@@ -17,7 +17,6 @@ return new class extends Migration
             $table->uuid('id')->primary()->unique();
             $table->string('name');
             $table->string('concentration');
-            $table->string('job_position_id')->nullable();
             $table->boolean('active')->default(0);
             $table->timestamps();
             $table->softDeletes();

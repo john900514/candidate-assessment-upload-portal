@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Admin\Assets;
 
+use App\Aggregates\Candidates\Assessments\QuizAggregate;
+use App\Enums\JobTypeEnum;
 use App\Http\Requests\Assets\QuizRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Class QuizCrudController
@@ -14,8 +17,8 @@ use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 class QuizCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as traitStore; }
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation { update as traitUpdate; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
@@ -39,8 +42,15 @@ class QuizCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::setFromDb(); // columns
+        CRUD::column('name')->type('text');
 
+        CRUD::column('concentration')->type('closure')
+            ->function(function ($entry) {
+                $role = strtoupper($entry->concentration);
+                return JobTypeEnum::from($role)->name;
+            });
+
+        CRUD::column('active')->type('boolean');
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
@@ -58,13 +68,36 @@ class QuizCrudController extends CrudController
     {
         CRUD::setValidation(QuizRequest::class);
 
-        CRUD::setFromDb(); // fields
+        CRUD::field('name')->type('text')->wrapper(['class' => 'col-6'])
+            ;
+
+        $job_types = [];
+        foreach(collect(JobTypeEnum::cases()) as $enum)
+        {
+            $job_types[$enum->value] = $enum->name;
+        }
+
+        $this->crud->field('concentration')->type('select_from_array')
+            ->options($job_types)->wrapper(['class' => 'col-6']);
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
          * - CRUD::field('price')->type('number');
          * - CRUD::addField(['name' => 'price', 'type' => 'number']));
          */
+    }
+
+    public function store()
+    {
+        $data = request()->all();
+        $uuid = Uuid::uuid4()->toString();
+
+        QuizAggregate::retrieve($uuid)
+            ->createQuiz($data['name'], $data['concentration'])
+            ->persist();
+
+        $this->crud->setSaveAction();
+        return $this->crud->performSaveAction($uuid);
     }
 
     /**
@@ -76,5 +109,21 @@ class QuizCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+
+        $aggy = QuizAggregate::retrieve($this->crud->getCurrentEntryId());
+
+        $tasks = $aggy->getQuestions();
+        $this->crud->field('table_of_tasks')->type('view')
+            ->view('card-bodies.assessment-tasks-table')->value($tasks)
+            ->tab('Questions');
+    }
+
+    public function update()
+    {
+        $data = request()->all();
+
+
+        $this->crud->setSaveAction();
+        return $this->crud->performSaveAction($this->crud->getCurrentEntryId());
     }
 }
