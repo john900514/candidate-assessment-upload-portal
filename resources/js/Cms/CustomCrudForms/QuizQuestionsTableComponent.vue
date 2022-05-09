@@ -16,7 +16,7 @@
         <tr v-for="(question, idx) in questions"  v-if="questions.length > 0" class="text-center">
             <td> {{ question['question_name'] }} </td>
             <td> {{ question['question_type'] }} </td>
-            <td><button type="button" class="btn btn-danger"><i class="las la-trash" @click="removeTask(question['questionId'])"></i></button></td>
+            <td><button type="button" class="btn btn-danger"><i class="las la-trash" @click="removeQuestion(question['questionId'])"></i></button></td>
         </tr>
         </tbody>
     </table>
@@ -33,7 +33,7 @@
 
 <script>
 import { $vfm, VueFinalModal, ModalsContainer } from 'vue-final-modal'
-import NewQuestion from "@/Cms/CustomCrudForms/CreateNewQuizQuestion";
+import NewQuestion from "@/Cms/CustomCrudForms/Screens/CreateNewQuizQuestion";
 
 
 export default {
@@ -72,21 +72,22 @@ export default {
         reloadTable() {
             window.location.reload();
         },
-        removeTask(taskName) {
-            let answer = confirm('Confirm that you want to remove this task.');
+        removeQuestion(questionId) {
+            let answer = confirm('Confirm that you want to remove this question.');
 
             if(answer) {
                 let payload = {
-                    'question_id': this.questionId,
-                    'question_name' : taskName,
+                    'quiz_id': this.questionId,
+                    'question_id': questionId,
                 }
 
-                /*
-                axios.delete('/portal/assets/', {data: payload})
+
+                axios.delete('/portal/assets/quizzes/'+this.questionId+'/questions', {data: payload})
                     .then(({ data }) => {
                         new Noty({
+                            theme: 'sunset',
                             type: 'success',
-                            text: 'Alright the task was deactivated.'
+                            text: 'Alright the question was deactivated.'
                         }).show()
 
                         setTimeout(function () {
@@ -95,14 +96,13 @@ export default {
                     })
                     .catch(({ response }) => {
                         new Noty({
+                            theme: 'sunset',
                             type: 'error',
-                            text: 'An error occurred. Your new task was not deactivated. Try again.'
+                            text: 'An error occurred. Your new question was not deactivated. Try again.'
                         }).show()
 
                         _this.loading = false;
                     })
-
-                 */
             }
         }
     },

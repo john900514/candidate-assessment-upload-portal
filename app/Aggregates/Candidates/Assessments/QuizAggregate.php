@@ -100,6 +100,12 @@ class QuizAggregate extends AggregateRoot
         return $this;
     }
 
+    public function deactivateQuestion(string $question_id) : self
+    {
+        $this->quiz_questions->deactivateQuestion($question_id);
+        return $this;
+    }
+
     public function getQuestions() : array
     {
         return $this->quiz_questions->getQuestions();
