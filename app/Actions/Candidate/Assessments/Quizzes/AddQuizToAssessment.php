@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Actions\Candidate\Assessments\Tasks;
+namespace App\Actions\Candidate\Assessments\Quizzes;
 
 use App\Aggregates\Candidates\Assessments\AssessmentAggregate;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class ReactivateTask
+class AddQuizToAssessment
 {
     use AsAction;
 
@@ -13,33 +13,31 @@ class ReactivateTask
     {
         return [
             'assessment_id' => ['bail','required', 'exists:assessments,id'],
-            'task_name' => ['bail','required','string'],
-            'task_description' => ['bail','required','string'],
-            'required' => ['bail','required','bool']
+            'quiz_id' => ['bail','required', 'exists:quizzes,id'],
         ];
     }
 
-    public function handle() : string|false
+    public function handle(string $assessment_id, string $quiz_id) : string|false
     {
-        $data = request()->all();
         try {
-            AssessmentAggregate::retrieve($data['assessment_id'])
-                ->addNewTask($data)->persist();
+            AssessmentAggregate::retrieve($assessment_id)
+                ->linkQuizToAssessment($quiz_id)->persist();
 
             $results = true;
         }
         catch(\Exception $e)
         {
+            dd($e->getMessage());
             $results = false;
         }
-
 
         return $results;
     }
 
     public function asController() : string|false
     {
-        return $this->handle();
+        $data = request()->all();
+        return $this->handle($data['assessment_id'], $data['quiz_id']);
     }
 
     public function jsonResponse(string|false $result)

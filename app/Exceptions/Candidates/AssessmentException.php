@@ -18,6 +18,16 @@ class AssessmentException extends DomainException
 
     public static function sourceCodeAlreadyAdded() : self
     {
-        return new self('Source Code already assign. Please remove first.');
+        return new self('Source Code already assigned. Please remove first.');
+    }
+
+    public static function quizAlreadyLinked()
+    {
+        return new self('Quiz is already Linked to assessment. Please remove first.');
+    }
+
+    public static function quizNotLinked()
+    {
+        return new self('Quiz is NOT Linked to assessment. Please add first.');
     }
 }

@@ -2,35 +2,32 @@
     <table class="table table-responsive-sm table-striped" id="assessment">
         <thead>
         <tr class="text-center">
-            <th>Task</th>
-            <th>Description</th>
-            <th>Status</th>
+            <th>Quiz</th>
+            <th>Concentration</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-if="tasks.length == 0" class="text-center">
-            <td> No </td>
-            <td> quizzes </td>
+        <tr v-if="quizzes.length == 0" class="text-center">
+            <td> No quizzes </td>
             <td> assigned.</td>
             <td> <button type="button" class="btn btn-primary" @click="openModal()">Assign</button> </td>
         </tr>
-        <tr v-for="(task, idx) in tasks"  v-if="tasks.length > 0" class="text-center">
-            <td> {{ task['task_name'] }} </td>
-            <td> {{ task['task_description'] }} </td>
-            <td> {{ task['required'] ? 'required' : 'optional' }} </td>
-            <td><button type="button" class="btn btn-danger"><i class="las la-trash" @click="removeTask(task['task_name'])"></i></button></td>
+        <tr v-for="(quiz, idx) in quizzes"  v-if="quizzes.length > 0" class="text-center">
+            <td> {{ quiz['name'] }} </td>
+            <td> {{ quiz['concentration'] }} </td>
+            <td><button type="button" class="btn btn-danger"><i class="las la-trash" @click="removeQuiz(quiz['quiz_id'])"></i></button></td>
         </tr>
         </tbody>
     </table>
-    <div v-if="tasks.length > 0" class="text-center">
-        <button type="button" class="btn btn-primary" @click="openModal()">Create New Task</button>
+    <div v-if="quizzes.length > 0" class="text-center">
+        <button type="button" class="btn btn-primary" @click="openModal()">Link Another Quiz</button>
     </div>
 
 
     <div>
         <vue-final-modal v-model="showModal" classes="modal-container" content-class="modal-content">
-            <new-task @cancel="() => closeModal()" :assessment-id="assessmentId" @reload="reloadTable()"></new-task>
+            <add-quiz @cancel="() => closeModal()" :assessment-id="assessmentId" @reload="reloadTable()" :options="availableQuizzes"></add-quiz>
         </vue-final-modal>
     </div>
 
@@ -38,19 +35,20 @@
 
 <script>
 import { $vfm, VueFinalModal, ModalsContainer } from 'vue-final-modal'
-import NewTask from "@/Cms/CustomCrudForms/Screens/CreateNewAssessmentTask";
+import AddQuiz from "@/Cms/CustomCrudForms/Screens/AddQuizToAssessment";
 
 export default {
     name: "AssessmentQuizzesTableComponent",
     components: {
-        NewTask,
+        AddQuiz,
         VueFinalModal,
         ModalsContainer
     },
-    props: ['assessmentId', 'preTasks'],
+    props: ['assessmentId', 'preQuizzes'],
     data() {
         return {
-            tasks: [],
+            quizzes: [],
+            availableQuizzes: [],
             showModal: false
         }
     },
@@ -64,20 +62,22 @@ export default {
         reloadTable() {
             window.location.reload();
         },
-        removeTask(taskName) {
+        removeQuiz(quizId) {
             let answer = confirm('Confirm that you want to remove this task.');
 
             if(answer) {
+                let _this = this;
+                this.loading = true;
                 let payload = {
                     'assessment_id': this.assessmentId,
-                    'task_name' : taskName,
+                    'quiz_id' : quizId,
                 }
 
-                axios.delete('/portal/assessments/tasks', {data: payload})
+                axios.delete('/portal/assessments/quizzes', {data: payload})
                     .then(({ data }) => {
                         new Noty({
                             type: 'success',
-                            text: 'Alright the task was deactivated.'
+                            text: 'Alright the quiz was deactivated.'
                         }).show()
 
                         setTimeout(function () {
@@ -87,18 +87,32 @@ export default {
                     .catch(({ response }) => {
                         new Noty({
                             type: 'error',
-                            text: 'An error occurred. Your new task was not deactivated. Try again.'
+                            text: 'An error occurred. The quiz deactivated. Try again.'
                         }).show()
 
                         _this.loading = false;
                     })
             }
+        },
+        getAvailableQuizzes() {
+            axios.get('/portal/assessments/quizzes?assessment_id='+this.assessmentId)
+                .then(({ data }) => {
+                    this.availableQuizzes = data['options'];
+                    console.log(data);
+                })
+                .catch(({ response }) => {
+                    this.availableQuizzes = [];
+                })
         }
     },
     mounted() {
-        for(let x in this.preTasks) {
-            this.tasks.push(this.preTasks[x]);
+        this.getAvailableQuizzes();
+
+        for(let x in this.preQuizzes) {
+            this.quizzes.push(this.preQuizzes[x]);
         }
+
+        console.log('quizzes', this.quizzes);
     }
 }
 </script>

@@ -91,6 +91,18 @@ class AssessmentAggregate extends AggregateRoot
         return $this;
     }
 
+    public function linkQuizToAssessment(string $quiz_id) : self
+    {
+        $this->quizzes->linkQuizToAssessment($quiz_id);
+        return $this;
+    }
+
+    public function unlinkQuizFromAssessment(string $quiz_id) : self
+    {
+        $this->quizzes->unlinkQuizFromAssessment($quiz_id);
+        return $this;
+    }
+
     public function deactivateTask(string $name) : self
     {
         $this->code_work->deactivateTask($name);
@@ -131,5 +143,10 @@ class AssessmentAggregate extends AggregateRoot
     public function getName() : string|null
     {
         return $this->name;
+    }
+
+    public function getConcentration() : int|null
+    {
+        return $this->concentration;
     }
 }

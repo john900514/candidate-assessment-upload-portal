@@ -26,8 +26,12 @@ Route::group([
     Route::post('candidates/submit-application', 'Candidate\Jobs\SubmitJobApplication');
 
     Route::post('assessments/tasks', 'Candidate\Assessments\Tasks\CreateNewTask');
-    Route::put('assessments/tasks', 'Candidate\Assessments\Tasks\ReactivateTask');
+    //Route::put('assessments/tasks', 'Candidate\Assessments\Tasks\ReactivateTask');
     Route::delete('assessments/tasks', 'Candidate\Assessments\Tasks\DeactivateTask');
+
+    Route::get('assessments/quizzes', 'Candidate\Assessments\Quizzes\GetAvailableQuizzesForAssessment');
+    Route::post('assessments/quizzes', 'Candidate\Assessments\Quizzes\AddQuizToAssessment');
+    Route::delete('assessments/quizzes', 'Candidate\Assessments\Quizzes\DeactivateQuizFromAssessment');
 });
 
 Route::group([

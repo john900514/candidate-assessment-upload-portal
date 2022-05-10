@@ -22,7 +22,6 @@
             </div>
         </div>
     </form>
-
 </template>
 
 <script>
@@ -62,6 +61,7 @@ export default {
             }
 
             let _this = this;
+            this.loading = true;
             let payload = {
                 'assessment_id': this.assessmentId,
                 'task_name' : this.form['task_name'],

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Candidates;
 
 use App\Actions\Candidate\Assessments\CreateNewAssessmentAction;
 use App\Aggregates\Candidates\Assessments\AssessmentAggregate;
+use App\Aggregates\Candidates\Assessments\QuizAggregate;
 use App\Enums\JobTypeEnum;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 use App\Exceptions\Candidates\AssessmentException;
@@ -192,11 +193,22 @@ class AssessmentCrudController extends CrudController
         }
 
         $tasks = $aggy->getTasks();
+
         $this->crud->field('table_of_tasks')->type('view')
             ->view('card-bodies.assessment-tasks-table')->value($tasks)
             ->tab('Tasks');
 
-        $quizzes = $aggy->getQuizzes();
+        $quiz_ids = $aggy->getQuizzes();
+        $quizzes = [];
+        foreach($quiz_ids as $quiz_id)
+        {
+            $quiz_aggy = QuizAggregate::retrieve($quiz_id);
+            $quizzes[] = [
+                'quiz_id' => $quiz_id,
+                'name' => $quiz_aggy->getName(),
+                'concentration' => JobTypeEnum::tryFrom($quiz_aggy->getConcentration())->name
+            ];
+        }
         $this->crud->field('table_of_tests')->type('view')
             ->view('card-bodies.assessment-quizzes-table')->value($quizzes)
             ->tab('Quizzes');
