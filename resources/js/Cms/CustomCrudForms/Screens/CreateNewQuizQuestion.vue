@@ -153,7 +153,7 @@ export default {
                 payload.answer = this.form.answer
             }
 
-            if(this.form.question_type !== 'MULTIPLE_CHOICE') {
+            if(this.form.question_type === 'MULTIPLE_CHOICE') {
                 payload.choices = this.availableChoices
             }
 

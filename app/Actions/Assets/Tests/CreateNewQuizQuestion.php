@@ -17,7 +17,7 @@ class CreateNewQuizQuestion
             'quiz_id' => ['bail','required', 'exists:quizzes,id'],
             'question_name' => ['bail','required','string'],
             'question_type' => ['bail','required','string'],
-            'answer' => ['sometimes','required','string'],
+            'answer' => ['sometimes','required'],
             'choices'=> ['sometimes','required','array'],
         ];
     }

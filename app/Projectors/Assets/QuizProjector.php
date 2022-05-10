@@ -47,6 +47,7 @@ class QuizProjector extends Projector
             'question_name' => $event->details['question_name'],
             'question_type' => $event->details['question_type']
         ]);
+
         $question->update(['id' => $event->question_id]);
 
         if(array_key_exists('answer', $event->details))
@@ -54,7 +55,7 @@ class QuizProjector extends Projector
             $question->update(['answer' => $event->details['answer']]);
         }
 
-        if(array_key_exists('choices', $event->details))
+        if(array_key_exists('choices', $event->details) && ($event->details['question_type']) == 'MULTIPLE_CHOICE')
         {
             $question->update(['available_choices' => $event->details['choices']]);
         }
