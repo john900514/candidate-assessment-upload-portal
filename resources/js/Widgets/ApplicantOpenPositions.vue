@@ -3,6 +3,7 @@
         <thead>
         <tr>
             <th>Job Posting</th>
+            <th># of Quizzes</th>
             <th># of Tests</th>
             <th>Status</th>
         </tr>
@@ -10,6 +11,7 @@
         <tbody>
         <tr v-for="(position, idx) in positions">
             <td>{{ position.jobTitle }}</td>
+            <td>{{ position.quizzes }}</td>
             <td>{{ position.assessments }}</td>
             <td><span class="badge" :class="position.statusBadge">{{ position.status }}</span></td>
             <td><button class="badge badge-info" @click="viewJobPositionModal(position)">View</button></td>

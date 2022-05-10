@@ -64,6 +64,7 @@ class FetchOpenJobs
                             $badge = 'badge-success';
                             break;
                     }
+                    
                     /**
                      * STEPS.
                      * 2. Get Assessment Names and IDs
@@ -73,6 +74,7 @@ class FetchOpenJobs
                     $results[] = [
                         'jobTitle' => $job_aggy->getJobTitle(),
                         'assessments' => count($assessments),
+                        'quizzes' => count($ass_aggy->getQuizzes()),
                         'status' => $job_again['status'],
                         'statusBadge' => $badge,
                         'desc' => $job_aggy->getDesc(),
