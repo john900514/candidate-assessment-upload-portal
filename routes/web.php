@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/portal');
 });
 
 Route::get('/portal/registration',  'App\Http\Controllers\Users\UserRegistrationController@index');

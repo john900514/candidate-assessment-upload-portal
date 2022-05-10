@@ -195,6 +195,11 @@ class AssessmentCrudController extends CrudController
         $this->crud->field('table_of_tasks')->type('view')
             ->view('card-bodies.assessment-tasks-table')->value($tasks)
             ->tab('Tasks');
+
+        $quizzes = $aggy->getQuizzes();
+        $this->crud->field('table_of_tests')->type('view')
+            ->view('card-bodies.assessment-quizzes-table')->value($quizzes)
+            ->tab('Quizzes');
     }
 
     public function update()
