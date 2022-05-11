@@ -49,4 +49,19 @@ class AssessmentQuizPartial extends AggregatePartial
     {
         return $this->quizzes;
     }
+
+    public function getDetailedQuizzes() : array
+    {
+        $results = [];
+
+        foreach($this->quizzes as $quiz_id)
+        {
+            $quiz_record = Quiz::find($quiz_id);
+            if(!is_null($quiz_record))
+            {
+                $results[] = $quiz_record->toArray();
+            }
+        }
+        return $results;
+    }
 }

@@ -39,7 +39,7 @@ const colors = {
         900: "#000A10",
     },
     accent: {
-        DEFAULT: "#82D300",
+        DEFAULT: "#1FB2A6",
         50: "#D3FF8C",
         100: "#CBFF77",
         200: "#BBFF4E",

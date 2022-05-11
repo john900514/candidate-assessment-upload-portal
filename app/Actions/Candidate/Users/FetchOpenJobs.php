@@ -64,7 +64,7 @@ class FetchOpenJobs
                             $badge = 'badge-success';
                             break;
                     }
-                    
+
                     /**
                      * STEPS.
                      * 2. Get Assessment Names and IDs

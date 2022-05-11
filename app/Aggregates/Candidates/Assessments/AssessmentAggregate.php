@@ -135,6 +135,11 @@ class AssessmentAggregate extends AggregateRoot
         return $this->code_work->getTasks();
     }
 
+    public function getDetailedQuizzes() : array
+    {
+        return $this->quizzes->getDetailedQuizzes();
+    }
+
     public function getQuizzes() : array
     {
         return $this->quizzes->getQuizzes();
