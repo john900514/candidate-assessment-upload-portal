@@ -5,6 +5,7 @@ namespace App\Aggregates\Users\Partials;
 use App\Aggregates\Candidates\Assessments\AssessmentAggregate;
 use App\Aggregates\Candidates\JobPositionAggregate;
 use App\Exceptions\Candidates\JobPositionException;
+use App\StorableEvents\Candidates\Assessments\CandidateAssessmentTaskStatusUpdated;
 use App\StorableEvents\Candidates\Assessments\CandidateJobAssessmentStatusUpdated;
 use App\StorableEvents\Candidates\Assessments\SourceCodeSubmittedForAssessment;
 use App\StorableEvents\Users\ApplicantCreated;
@@ -99,7 +100,7 @@ class CandidateProfilePartial extends AggregatePartial
                 switch($event->new_status)
                 {
                     case 'Not Started':
-                        $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-danger';
+                        $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-error';
                         break;
 
                     case 'Started':
@@ -160,6 +161,11 @@ class CandidateProfilePartial extends AggregatePartial
         }
     }
 
+    public function applyCandidateAssessmentTaskStatusUpdated(CandidateAssessmentTaskStatusUpdated $event)
+    {
+        $this->application_statuses[$event->job_id]['assessments'][$event->assessment_id]['task_statuses'][$event->task_name] = $event->details;
+    }
+
     public function applyApplicantLinkedToJobPosition(ApplicantLinkedToJobPosition $event)
     {
         $this->open_job_positions = $event->job_positions;
@@ -182,14 +188,37 @@ class CandidateProfilePartial extends AggregatePartial
                     $has_source = $ass_aggy->hasCodeWork();
                     $this->application_statuses[$job_id]['assessments'][$assessment] = [
                         'status' => 'Not Started',
-                        'badge'  => 'badge-danger',
+                        'badge'  => 'badge-error',
                         'quizzesReqd' => $quizzes_reqd,
+                        'quizzesRemaining' => $quizzes_reqd,
                         'tasksReqd' => $tasks_reqd,
+                        'tasksRemaining' => $tasks_reqd,
                         'sourceReqd' => $has_source,
                         'quizzesCompleted' => ($quizzes_reqd == 0),
                         'tasksCompleted' => ($tasks_reqd == 0),
-                        'sourceUploaded' => ($has_source == false)
+                        'sourceUploaded' => ($has_source == false),
+                        'task_statuses' => [],
+                        'quiz_statuses' => [],
                     ];
+
+                    $tasks = $ass_aggy->getTasks();
+                    foreach ($tasks as $task_name => $task)
+                    {
+                        $this->application_statuses[$job_id]['assessments'][$assessment]['task_statuses'][$task_name] = [
+                            'status' => 'Incomplete',
+                            'badge' => 'badge-error',
+                            'date_started' => null,
+                            'date_completed' => null,
+                            'response' => null
+                        ];
+                    }
+
+                    $quizzes = $ass_aggy->getQuizzes();
+
+                    foreach ($quizzes as $wtf => $bbw)
+                    {
+                        dd($quizzes);
+                    }
                 }
 
             }
@@ -235,6 +264,37 @@ class CandidateProfilePartial extends AggregatePartial
     public function updateJobAssessmentStatus(string $job_id, string $assessment_id, string $status, array $misc = []) : self
     {
         $this->recordThat(new CandidateJobAssessmentStatusUpdated($this->aggregateRootUuid(), $job_id, $assessment_id, $status, $misc));
+        return $this;
+    }
+
+    public function updateAssessmentTaskStatus(string $job_id, string $assessment_id, string $task_name, string $status) : self
+    {
+        $assessment_status = $this->getAssessmentStatus($job_id, $assessment_id);
+        $task_statuses = $assessment_status['task_statuses'];
+        $task = $task_statuses[$task_name];
+
+        if($task['status'] == 'Complete')
+        {
+            // @todo - throw error
+            return $this;
+        }
+
+        switch($status)
+        {
+            case 'Started':
+                $task['status'] = $status;
+                $task['badge'] = 'badge-warning';
+                $task['date_started'] = date('Y-m-d H:i:s');
+                break;
+
+            case 'Stopped':
+                $task['status'] = $status;
+                $task['badge'] = 'badge-error';
+                break;
+        }
+
+        $this->recordThat(new CandidateAssessmentTaskStatusUpdated($this->aggregateRootUuid(), $job_id, $assessment_id, $task_name, $task));
+
         return $this;
     }
 

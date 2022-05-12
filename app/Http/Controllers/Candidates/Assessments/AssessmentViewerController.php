@@ -48,7 +48,9 @@ class AssessmentViewerController extends Controller
             'userData' => []
         ];
 
+        $user_aggy = UserAggregate::retrieve(backpack_user()->id);
         $assy_aggy = AssessmentAggregate::retrieve($assessment_id);
+        $data['assessment']['id'] = $assessment_id;
         $data['assessment']['name'] = $assy_aggy->getName();
         $data['assessment']['concentration'] = JobTypeEnum::tryFrom($assy_aggy->getConcentration())->name;
         $data['assessment']['tasks'] = [
@@ -64,6 +66,37 @@ class AssessmentViewerController extends Controller
             'source' => $assy_aggy->hasCodeWork() ? SourceCodeUpload::find($assy_aggy->getCodeWorkId())->toArray() ?? [] : []
         ];
 
+        $open_positions = $user_aggy->getOpenJobPositions();
+        foreach($open_positions as $idx => $job_id)
+        {
+            if($assessment_status = $user_aggy->getAssessmentStatus($job_id, $assessment_id))
+            {
+                break;
+            }
+        }
+
+        if($assessment_status ?? false)
+        {
+            $data['userData'] = $assessment_status;
+
+            // check if the installer was downloaded and we'll assume it was installed
+            $data['userData']['sourceInstalled'] = $user_aggy->hasDownloadedInstaller();
+        }
+        else
+        {
+            $data['userData'] = [
+                "status" => "Not Started",
+                "badge" => "badge-danger",
+                "quizzesReqd" => 0,
+                "tasksReqd" => 0,
+                "sourceReqd" => true,
+                "quizzesCompleted" => false,
+                "tasksCompleted" => false,
+                "sourceUploaded" => false,
+            ];
+        }
+
+//dd($data);
 
         return Inertia::render('Candidates/Assessments/AssessmentDashboard', $data);
     }

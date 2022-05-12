@@ -171,6 +171,12 @@ class UserAggregate extends AggregateRoot
         return $this;
     }
 
+    public function updateAssessmentTaskStatus(string $job_id, string $assessment_id, string $task_name, string $status) : self
+    {
+        $this->candidate_profile->updateAssessmentTaskStatus($job_id, $assessment_id, $task_name, $status);
+        return $this;
+    }
+
     public function submitSourceCodeUpload(string $file_upload_id, string $file_upload_date, string $path, string $assessment_id) : self
     {
         $this->candidate_profile->submitSourceCodeUpload($file_upload_id, $file_upload_date, $path, $assessment_id);
