@@ -8,6 +8,9 @@
                     <span class="badge" :class="udata.badge">{{ udata.status }}</span>
                     <br />
                     <small><a href="/portal/dashboard" class="hover:text-success"> {{ '<<'}} Go Back </a></small>
+                    <br />
+
+                    <p class="text-lg pt-4 mx-4">Directions: <i> You have 4 hours to complete all the required sections of the assessment. If the assessment requires you to download and submit source code, you should download the CLI tool and login with it to download. Once installed, complete each task that's required. Remember not to start the assessment until you are ready to complete it in one sitting. If you complete it later than 4 hours, you will still be able to submit your application on completion but your application may be rejected. Good luck!</i></p>
                 </div>
 
                 <div class="mx-auto pt-8 ">

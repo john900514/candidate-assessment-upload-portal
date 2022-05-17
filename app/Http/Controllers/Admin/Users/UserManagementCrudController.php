@@ -252,7 +252,7 @@ class UserManagementCrudController extends CrudController
             $departments = [
                 'ENGINEERING' => 'Development'
             ];
-            
+
             $this->crud->field('department')->type('select_from_array')
                 ->wrapper(['class' => 'col-sm-12 col-md-6'])
                 ->options($departments)->value($aggy->getDepartment());

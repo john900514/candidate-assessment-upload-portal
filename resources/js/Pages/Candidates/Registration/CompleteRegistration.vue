@@ -1,7 +1,7 @@
 <template>
     <basic-ass-layout>
         <template #content>
-            <div class="w-full h-full flex justify-center items-center">
+            <div class="w-full h-screen flex justify-center items-center">
                 <div class="w-4/5 md:w-[50%] border border-secondary">
                     <div class="w-full mb-4">
                         <div id="formHeader" class="text-center mb-4 md:mb-8">
