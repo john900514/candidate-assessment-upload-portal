@@ -10,7 +10,24 @@
                     <small><a href="/portal/dashboard" class="hover:text-success"> {{ '<<'}} Go Back </a></small>
                     <br />
 
-                    <p class="text-lg pt-4 mx-4">Directions: <i> You have 4 hours to complete all the required sections of the assessment. If the assessment requires you to download and submit source code, you should download the CLI tool and login with it to download. Once installed, complete each task that's required. Remember not to start the assessment until you are ready to complete it in one sitting. If you complete it later than 4 hours, you will still be able to submit your application on completion but your application may be rejected. Good luck!</i></p>
+                    <p class="text-lg pt-4 mx-8 md:mx-24">Directions: <i> You have 4 hours to complete all the required sections of the assessment. If the assessment requires you to download and submit source code, you should download the CLI tool and login with it to download. Once installed, complete each task that's required. Remember not to start the assessment until you are ready to complete it in one sitting. If you complete it later than 4 hours, you will still be able to submit your application on completion but your application may be rejected. Good luck!</i></p>
+                </div>
+
+                <div class="mx-auto pt-8 md:hidden">
+                    <div id="mobileTimeLeft" class="stats shadow">
+                        <div class="stat">
+                            <div class="stat-figure text-secondary">
+                                <div class="avatar">
+                                    <div class="w-16 rounded-full">
+                                        <p class="text-warning text-6xl"><i class="las la-stopwatch"></i></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stat-value">{{ timeLeft }}</div>
+                            <div class="stat-title">Time Remaining</div>
+                            <div class="stat-desc text-secondary">To Complete assessment</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mx-auto pt-8 ">
@@ -53,6 +70,19 @@
                             <div class="stat-desc" v-if="!udata.sourceInstalled">Source Code Available!</div>
                             <div class="stat-title truncate">{{ assessment.source.source['file_nickname']}}</div>
                             <div class="stat-desc text-secondary" v-if="!udata.sourceInstalled">Download the Installer</div>
+                        </div>
+
+                        <div class="stat extra-w">
+                            <div class="stat-figure text-secondary">
+                                <div class="avatar">
+                                    <div class="w-16 rounded-full">
+                                        <p class="text-warning text-6xl"><i class="las la-stopwatch"></i></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stat-value">{{ timeLeft }}</div>
+                            <div class="stat-title">Time Remaining</div>
+                            <div class="stat-desc text-secondary">To Complete assessment</div>
                         </div>
                     </div>
                 </div>
@@ -170,6 +200,11 @@ export default {
         };
     },
     computed: {
+        timeLeft() {
+            let r = '4:00'
+
+            return r;
+        },
         taskPercent() {
             console.log('taskPercent', this.assessment);
             let pct = 0;
