@@ -107,7 +107,7 @@ class CandidateProfilePartial extends AggregatePartial
                         $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-info';
                         break;
 
-                    case 'Completed':
+                    case 'Complete':
                         $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-success';
                         break;
 
@@ -126,8 +126,10 @@ class CandidateProfilePartial extends AggregatePartial
 
                 if(array_key_exists('tasksCompleted', $event->details))
                 {
+                    $total = $this->application_statuses[$job_id]['assessments'][$assessment];
+                    dd($total);
                     /*
-                    $total = $this->application_statuses[$job_id]['assessments'][$assessment]['tasksCompleted'];
+                    ['tasksCompleted'];
                     $total -= $event->details['tasksCompleted'];
                     $this->application_statuses[$job_id]['assessments'][$assessment]['tasksCompleted'] = $total;
                     */
@@ -148,15 +150,23 @@ class CandidateProfilePartial extends AggregatePartial
                     $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-success';
                 }
 
-                // @todo - check the status of the application it self
-                $total_asses = count($this->application_statuses[$job_id]['assessments']);
                 $total_completed = 0;
-                foreach($this->application_statuses[$job_id]['assessments'] as $assessment)
+
+                foreach ($status_review['task_statuses'] as $task_name => $task_status)
                 {
-                    if($assessment['status'] == 'Completed') $total_completed++;
+                    /**
+                     * 1. If tasksReqd > 0, check on all the tasks
+                     * 2. if quizzesReq > 0, check on the quizzes
+                     * 3. If source code needed, check that the installer was downloaded.
+                     */
+                    if(!array_key_exists('required', $task_status))
+                    {
+                        dd(count($this->application_statuses[$job_id]['assessments']), $task_status);
+                    }
+
                 }
 
-                if($total_asses == $total_completed) $this->application_statuses[$job_id]['status'] = 'Ready to Apply';
+                //if($total_asses == $total_completed) $this->application_statuses[$job_id]['status'] = 'Ready to Apply';
             }
         }
     }
@@ -184,7 +194,13 @@ class CandidateProfilePartial extends AggregatePartial
                 {
                     $ass_aggy = AssessmentAggregate::retrieve($assessment);
                     $quizzes_reqd = count($ass_aggy->getQuizzes());
-                    $tasks_reqd = count($ass_aggy->getTasks());
+                    $total_tasks = $ass_aggy->getTasks();
+                    $tasks_reqd = 0;
+                    foreach ($total_tasks as $col => $val)
+                    {
+                        if($val['required']) $tasks_reqd++;
+                    }
+
                     $has_source = $ass_aggy->hasCodeWork();
                     $this->application_statuses[$job_id]['assessments'][$assessment] = [
                         'status' => 'Not Started',
@@ -209,7 +225,8 @@ class CandidateProfilePartial extends AggregatePartial
                             'badge' => 'badge-error',
                             'date_started' => null,
                             'date_completed' => null,
-                            'response' => null
+                            'response' => null,
+                            'required' => $task['required']
                         ];
                     }
 
@@ -267,7 +284,7 @@ class CandidateProfilePartial extends AggregatePartial
         return $this;
     }
 
-    public function updateAssessmentTaskStatus(string $job_id, string $assessment_id, string $task_name, string $status) : self
+    public function updateAssessmentTaskStatus(string $job_id, string $assessment_id, string $task_name, string $status, string|null $response) : self
     {
         $assessment_status = $this->getAssessmentStatus($job_id, $assessment_id);
         $task_statuses = $assessment_status['task_statuses'];
@@ -290,6 +307,13 @@ class CandidateProfilePartial extends AggregatePartial
             case 'Stopped':
                 $task['status'] = $status;
                 $task['badge'] = 'badge-error';
+                break;
+
+            case 'finished':
+                $task['status'] = 'Complete';
+                $task['badge'] = 'badge-success';
+                $task['response'] = $response;
+                $task['date_completed'] = date('Y-m-d H:i:s');
                 break;
         }
 

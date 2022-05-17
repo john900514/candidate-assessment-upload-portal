@@ -22,7 +22,7 @@
                             </div>
                             <div class="stat-value">{{ taskPercent }}</div>
                             <div class="stat-title">Tasks: {{ assessment.tasks.total }}</div>
-                            <div class="stat-desc text-secondary">4 tasks remaining</div>
+                            <div class="stat-desc text-secondary">{{ tasksToComplete }}</div>
                         </div>
 
                         <div class="stat">
@@ -168,6 +168,7 @@ export default {
     },
     computed: {
         taskPercent() {
+            console.log('taskPercent', this.assessment);
             let pct = 0;
 
             if(this.assessment.tasks.total === 0) {
@@ -175,6 +176,23 @@ export default {
             }
             else {
                 // @todo - calculate the actual pct-age completed
+                let total = this.assessment.tasks.total;
+                let required = 0;
+                let finished = 0;
+                for(let x in this.assessment.tasks.list) {
+                    let task = this.assessment.tasks.list[x];
+                    if(task.required) {
+                        required++;
+
+                        let status = this.udata['task_statuses'][task['task_name']]
+                        if(status.status === 'Complete') {
+                            finished++;
+                        }
+                    }
+                }
+
+                let rawPct = (finished / required) * 100;
+                pct = rawPct.toFixed(0);
             }
 
             return `${pct}%`
@@ -183,8 +201,21 @@ export default {
             let r = 'No tasks required';
 
             if(this.assessment.tasks.total > 0) {
-                r = `${this.assessment.tasks.total} tasks remaining`
-                // @todo - calculate the actual pct-age completed
+                let required = 0;
+                let finished = 0;
+                for(let x in this.assessment.tasks.list) {
+                    let task = this.assessment.tasks.list[x];
+                    if(task.required) {
+                        // @todo - deduct from required tasks that are complete
+                        let status = this.udata['task_statuses'][task['task_name']]
+                        if(status.status !== 'Complete') {
+                            required++;
+                        }
+
+                    }
+                }
+
+                r = `${required} tasks remaining`
             }
 
             return r
@@ -225,24 +256,23 @@ export default {
             this.showTaskModal = false;
         },
         taskStatusChange(status) {
+            let url = '/portal/assessments/tasks/status';
             let payload = {
                 'task_name': this.activeTask.task_name,
-                status: status,
+                status: status.status,
                 'assessment_id': this.assessment.id
             };
 
+            if(('explanation' in status) && (status['explanation'] !== '')) {
+                payload['explanation'] = status.explanation;
+                url = `${url}/complete`;
+            }
+
             let _this = this;
             // Axios to the server to update the status
-            axios.post('/portal/assessments/tasks/status', payload)
+            axios.post(url, payload)
                 .then(({ data }) => {
                    _this.udata = data.userData;
-
-                    /**
-                     * STEPS
-                     * 1.
-                     * 2. Server should return a new copy of the user data
-                     * 3. set udata to that
-                     */
                     //this.udata['task_statuses'][this.activeTask.task_name]['status'] = status;
                     //this.udata['status'] = 'Started';
                     //this.udata['badge'] = 'badge-info';
@@ -274,7 +304,7 @@ export default {
             let r = 'Fuck You';
 
             if('task_statuses' in this.udata) {
-                console.log(this.udata['task_statuses']);
+                //console.log(this.udata['task_statuses']);
                 if(taskName in this.udata['task_statuses']) {
                     r = this.udata['task_statuses'][taskName].badge;
                 }

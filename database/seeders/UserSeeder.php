@@ -32,7 +32,8 @@ class UserSeeder extends Seeder
                 'name' => 'angel',
                 'email' => 'angel@capeandbay.com',
                 'password' => bcrypt('Hello123!'),
-                'role' => 'dept_head'
+                'role' => 'dept_head',
+                'dept' => 'ENGINEERING'
             ],
             [
                 'first_name' => 'Philip',
@@ -40,7 +41,8 @@ class UserSeeder extends Seeder
                 'name' => 'philip',
                 'email' => 'philip@capeandbay.com',
                 'password' => bcrypt('Hello123!'),
-                'role' => 'dev_lead'
+                'role' => 'dev_lead',
+                'dept' => 'ENGINEERING'
             ],
             [
                 'first_name' => 'Blair',
@@ -48,7 +50,8 @@ class UserSeeder extends Seeder
                 'name' => 'blair',
                 'email' => 'blair@capeandbay.com',
                 'password' => bcrypt('Hello123!'),
-                'role' => 'senior_dev'
+                'role' => 'senior_dev',
+                'dept' => 'ENGINEERING'
             ],
             [
                 'first_name' => 'Sterling',
@@ -56,15 +59,8 @@ class UserSeeder extends Seeder
                 'name' => 'sterling',
                 'email' => 'sterling@capeandbay.com',
                 'password' => bcrypt('Hello123!'),
-                'role' => 'senior_dev'
-            ],
-            [
-                'first_name' => 'Steve',
-                'last_name' => 'Deemer',
-                'name' => 'steve',
-                'email' => 'steve@capeandbay.com',
-                'password' => bcrypt('Hello123!'),
-                'role' => 'senior_dev'
+                'role' => 'senior_dev',
+                'dept' => 'ENGINEERING'
             ],
             [
                 'first_name' => 'Shivam',
@@ -72,7 +68,8 @@ class UserSeeder extends Seeder
                 'name' => 'shivam',
                 'email' => 'shivam@capeandbay.com',
                 'password' => bcrypt('Hello123!'),
-                'role' => 'project_manager'
+                'role' => 'project_manager',
+                'dept' => 'ENGINEERING'
             ],
             [
                 'first_name' => 'Amy',
@@ -80,16 +77,9 @@ class UserSeeder extends Seeder
                 'name' => 'amy',
                 'email' => 'amy@capeandbay.com',
                 'password' => bcrypt('Hello123!'),
-                'role' => 'hr'
-            ],
-            [
-                'first_name' => 'Developer',
-                'last_name' => 'Applicant',
-                'name' => 'jondoe',
-                'email' => 'applicant@gmail.com',
-                'password' => bcrypt('Hello123!'),
-                'role' => 'applicant'
-            ],
+                'role' => 'dept_head',
+                'dept' => 'HR'
+            ]
         ];
 
         foreach($dev_dept as $dev)

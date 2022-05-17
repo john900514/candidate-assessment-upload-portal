@@ -18,6 +18,7 @@ class JobPositionAggregate extends AggregateRoot
 {
     protected string|null $job_title = null;
     protected string|null $description = null;
+    protected string|null $department = null;
     protected string|null $awarded_role = 'dev';
     protected string|null $job_type = null;
     protected bool $active = false;
@@ -30,9 +31,38 @@ class JobPositionAggregate extends AggregateRoot
 
     public function applyJobPositionCreated(JobPositionCreated $event)
     {
-        $this->job_title = $event->config['position'];
-        $this->job_type = $event->config['concentration']['value'] ?? $event->config['concentration']->value ?? $event->config['concentration'];
-        $this->awarded_role = $event->config['awarded_role']['value'] ?? $event->config['awarded_role']->value ?? $event->config['awarded_role'];
+        try {
+            $this->job_title = $event->config['position'];
+        }
+        catch(\Error $e)
+        {
+            $this->job_title = $event->config->position;
+        }
+
+        try {
+            $this->department = $event->config['department']->value;
+        }
+        catch(\Error $e)
+        {
+            $this->department = $event->config->department->value;
+        }
+
+        try {
+            $this->job_type = $event->config['concentration']['value'] ?? $event->config['concentration']->value ?? $event->config['concentration'];
+        }
+        catch(\Error $e)
+        {
+            $this->job_type = $event->config['concentration']->value ?? $event->config['concentration'];
+        }
+
+        try {
+            $this->awarded_role = $event->config['awarded_role']['value'] ?? $event->config['awarded_role']->value ?? $event->config['awarded_role'];
+
+        }
+        catch(\Error $e)
+        {
+            $this->awarded_role = $event->config['awarded_role']->value ?? $event->config['awarded_role'];
+        }
     }
 
     public function applyQualifiedRoleAdded(QualifiedRoleAdded $event)

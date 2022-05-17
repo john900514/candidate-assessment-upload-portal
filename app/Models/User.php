@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Aggregates\Users\UserAggregate;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -71,5 +72,10 @@ class User extends Authenticatable
     public function available_positions()
     {
         return $this->detail()->where('name', '=', 'available_positions');
+    }
+
+    public function getAggregate(): UserAggregate | false
+    {
+        return is_null($this->id) ? false : UserAggregate::retrieve($this->id);
     }
 }

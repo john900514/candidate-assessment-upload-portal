@@ -22,6 +22,7 @@ class UserAggregate extends AggregateRoot
     protected string|null $first_name = null;
     protected string|null $last_name = null;
     protected string|null $role = 'applicant';
+    protected string|null $dept = null;
     protected bool $verified = false;
 
     protected EmployeeProfilePartial $employee_profile;
@@ -43,6 +44,10 @@ class UserAggregate extends AggregateRoot
         $this->last_name = $event->details['last_name'];
         $this->email = $event->details['email'];
         $this->role  = $event->role;
+        if(array_key_exists('dept', $event->details))
+        {
+            $this->dept = $event->details['dept'];
+        }
 
     }
     public function applyUserUpdated(UserUpdated $event)
@@ -171,9 +176,9 @@ class UserAggregate extends AggregateRoot
         return $this;
     }
 
-    public function updateAssessmentTaskStatus(string $job_id, string $assessment_id, string $task_name, string $status) : self
+    public function updateAssessmentTaskStatus(string $job_id, string $assessment_id, string $task_name, string $status, string|null $response = null) : self
     {
-        $this->candidate_profile->updateAssessmentTaskStatus($job_id, $assessment_id, $task_name, $status);
+        $this->candidate_profile->updateAssessmentTaskStatus($job_id, $assessment_id, $task_name, $status, $response);
         return $this;
     }
 
@@ -256,6 +261,11 @@ class UserAggregate extends AggregateRoot
     public function getAssessmentStatus(string $job_id, string|null $assessment_id = null) : false|array
     {
         return $this->candidate_profile->getAssessmentStatus($job_id, $assessment_id);
+    }
+
+    public function getDepartment(): string|null
+    {
+        return $this->dept;
     }
 
 }

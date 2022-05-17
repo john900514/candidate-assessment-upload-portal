@@ -5,7 +5,7 @@
             <div class="mx-4 py-4">
                 <p class="text-primary"><i>{{ taskDesc }}</i></p>
             </div>
-            <div v-if="!started">
+            <div v-if="(!started) && (!completed)">
                 <button class="btn btn-success" @click="started=true">Start this Task</button>
             </div>
             <div class="w-3/4 flex flex-col mx-auto" v-if="started">
@@ -24,37 +24,49 @@ export default {
     watch: {
         task(task) {
             console.log('new task', this.task)
+            this.sendUpdate = false;
             this.setUpForm();
+
+            let _this = this;
+            setTimeout(function () {
+                _this.sendUpdate = true;
+            }, 1000)
         },
         started(flag) {
-            if(flag) {
-                this.emitStartedStatus('Started');
-            }
-            else {
-                this.emitStartedStatus('stopped');
+
+            if(this.sendUpdate)
+            {
+                if(flag) {
+                    this.emitStartedStatus({explanation: this.explanation, status: 'Started'});
+                }
+                else {
+                    this.emitStartedStatus({explanation: this.explanation, status: 'Stopped'});
+                }
             }
         },
         completed(flag) {
-            if(flag) {
-                if(this.explanation !== '') {
-                    new Noty({
-                        theme: 'sunset',
-                        type: 'success',
-                        text: 'Task logged.'
-                    }).show()
-                    this.emitStartedStatus('finished');
+            if(this.sendUpdate) {
+                if(flag) {
+                    if(this.explanation !== '') {
+                        new Noty({
+                            theme: 'sunset',
+                            type: 'success',
+                            text: 'Task logged.'
+                        }).show()
+                        this.emitStartedStatus({explanation: this.explanation, status: 'finished'});
+                    }
+                    else {
+                        new Noty({
+                            theme: 'sunset',
+                            type: 'warning',
+                            text: 'Enter an explanation before submitting.'
+                        }).show()
+                        this.completed = false;
+                    }
                 }
                 else {
-                    new Noty({
-                        theme: 'sunset',
-                        type: 'warning',
-                        text: 'Enter an explanation before submitting.'
-                    }).show()
-                    this.completed = false;
+                    this.emitStartedStatus({explanation: this.explanation, status: 'Started'});
                 }
-            }
-            else {
-                this.emitStartedStatus('started');
             }
         }
     },
@@ -62,7 +74,8 @@ export default {
         return {
             started: false,
             completed: false,
-            explanation: ''
+            explanation: '',
+            sendUpdate: false
         }
     },
     computed: {
@@ -95,12 +108,23 @@ export default {
                     this.completed = false;
                     this.explanation = ''
                     break;
+
+                case 'Complete':
+                    this.started = true;
+                    this.completed = true;
+                    this.explanation = this.userStatus.response
+                    break;
             }
         }
     },
     mounted() {
         console.log('task', this.task)
         this.setUpForm();
+
+        let _this = this;
+        setTimeout(function () {
+            _this.sendUpdate = true;
+        }, 1000)
     }
 }
 </script>

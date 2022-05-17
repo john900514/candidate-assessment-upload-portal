@@ -31,8 +31,10 @@ class DashboardController extends Controller
 
         $aggy = UserAggregate::retrieve(backpack_user()->id);
 
+
         if($aggy->isApplicant())
         {
+            // @todo - adjust applicants
             if($aggy->hasSubmittedResume())
             {
                 $todo_list_data = GetToDoList::run(backpack_user()->id);
@@ -91,18 +93,22 @@ class DashboardController extends Controller
             switch($role)
             {
                 case 'dept_head':
-                    $this->data['widgets']['before_content'] = [DeptHeadDashboard::run()];
+                    switch($aggy->getDepartment())
+                    {
+                        case 'ENGINEERING':
+                            $this->data['widgets']['before_content'] = [DeptHeadDashboard::run()];
+                            break;
 
+                        case 'HR':
+                            $this->data['widgets']['before_content'] = [HRDashboard::run()];
+                            break;
+
+                    }
                     break;
 
                 case 'dev_lead':
                     $this->data['widgets']['before_content'] = [DevLeadDashboard::run()];
                     break;
-
-                case 'hr':
-                    $this->data['widgets']['before_content'] = [HRDashboard::run()];
-                    break;
-
 
                 default:
                     // The default Empty State
