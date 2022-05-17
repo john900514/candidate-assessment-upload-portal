@@ -127,7 +127,7 @@ class CandidateProfilePartial extends AggregatePartial
                 if(array_key_exists('tasksCompleted', $event->details))
                 {
                     $total = $this->application_statuses[$job_id]['assessments'][$assessment];
-                    dd($total);
+                    //dd($total);
                     /*
                     ['tasksCompleted'];
                     $total -= $event->details['tasksCompleted'];
@@ -234,7 +234,7 @@ class CandidateProfilePartial extends AggregatePartial
 
                     foreach ($quizzes as $wtf => $bbw)
                     {
-                        dd($quizzes);
+                        //dd($quizzes);
                     }
                 }
 

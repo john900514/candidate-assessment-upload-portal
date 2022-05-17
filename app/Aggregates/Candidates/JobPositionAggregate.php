@@ -42,6 +42,10 @@ class JobPositionAggregate extends AggregateRoot
         try {
             $this->department = $event->config['department']->value;
         }
+        catch(\ErrorException $e)
+        {
+            $this->department = $event->config['department']['value'];
+        }
         catch(\Error $e)
         {
             $this->department = $event->config->department->value;

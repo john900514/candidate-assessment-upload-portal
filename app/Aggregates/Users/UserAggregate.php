@@ -68,6 +68,11 @@ class UserAggregate extends AggregateRoot
         $this->last_name = $event->details['last_name'];
         $this->email = $event->details['email'];
         $this->role  = $event->role;
+
+        if(array_key_exists('dept', $event->details))
+        {
+            $this->dept = $event->details['dept'];
+        }
     }
 
     public function applyApplicantRoleChanged(ApplicantRoleChanged $event)

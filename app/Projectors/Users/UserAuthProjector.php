@@ -56,6 +56,13 @@ class UserAuthProjector extends Projector
     }
     public function onApplicantCreated(ApplicantCreated $event)
     {
+        $user_dept = false;
+        if(array_key_exists('dept', $event->details))
+        {
+            $user_dept = $event->details;
+            unset($event->details['dept']);
+        }
+
         $user = User::create($event->details);
         $user->id = $event->user_id;
         $user->save();
@@ -68,6 +75,17 @@ class UserAuthProjector extends Projector
 
         $employee->value  = 'non-employee';
         $employee->save();
+
+        if($user_dept)
+        {
+            $dept = UserDetails::firstOrCreate([
+                'user_id' => $user->id,
+                'name' => 'dept',
+                'active' => 1
+            ]);
+            $dept->value = $user_dept;
+            $dept->save();
+        }
 
         Bouncer::assign($event->role)->to($user);
     }

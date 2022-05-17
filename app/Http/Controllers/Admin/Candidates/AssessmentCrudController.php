@@ -62,7 +62,7 @@ class AssessmentCrudController extends CrudController
          * - CRUD::addColumn(['name' => 'price', 'type' => 'number']);
          */
         $this->crud->denyAccess('show');
-        if(!Bouncer::is(backpack_user())->a('admin', 'dept_head'))
+        if(!Bouncer::is(backpack_user())->a('admin', 'dept_head', 'dev_lead'))
         {
             $this->crud->denyAccess('create');
             $this->crud->denyAccess('update');

@@ -128,7 +128,16 @@ class UserManagementCrudController extends CrudController
                 //'APPLICANT'      => 'Unqualified Applicant'
             ];
 
-            $this->crud->field('role')->type('select_from_array')->options($roles);
+            $this->crud->field('role')->type('select_from_array')
+                ->wrapper(['class' => 'col-sm-12 col-md-6'])
+                ->options($roles);
+
+            $departments = [
+                'ENGINEERING' => 'Development'
+            ];
+            $this->crud->field('department')->type('select_from_array')
+                ->wrapper(['class' => 'col-sm-12 col-md-6'])
+                ->options($departments);
 
             $this->crud->addField([
                 'label' => 'Link Job Position(s) to Applicant',
@@ -169,6 +178,7 @@ class UserManagementCrudController extends CrudController
             'email' => $data['email'],
             'name' => $data['name'] ?? '',
             'password' => bcrypt('er]sawrkaxgjkpwrbdmbpqe]'),
+            'dept' => $data['department']
         ];
         $role = strtolower($data['role']);
 
@@ -236,7 +246,16 @@ class UserManagementCrudController extends CrudController
             ];
 
             $this->crud->field('role')->type('select_from_array')
+                ->wrapper(['class' => 'col-sm-12 col-md-6'])
                 ->options($roles)->value(strtoupper($entry->getRoles()[0]));
+
+            $departments = [
+                'ENGINEERING' => 'Development'
+            ];
+            
+            $this->crud->field('department')->type('select_from_array')
+                ->wrapper(['class' => 'col-sm-12 col-md-6'])
+                ->options($departments)->value($aggy->getDepartment());
 
             // @todo - get data recall on this.
             $this->crud->addField([
