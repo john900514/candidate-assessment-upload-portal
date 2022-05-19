@@ -8,6 +8,7 @@ use App\Aggregates\Users\UserAggregate;
 use App\Enums\JobTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Assets\SourceCodeUpload;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -79,6 +80,15 @@ class AssessmentViewerController extends Controller
         {
             $data['userData'] = $assessment_status;
 
+            $data['userData']['time_left'] = '4:00';
+            if(array_key_exists('time_expires', $assessment_status))
+            {
+                $now = Carbon::parse(date('Y-m-d H:i:s'));
+                $expy = Carbon::parse(date($assessment_status['time_expires']));
+                $min_left = $now->diff($expy)->i > 9 ? $now->diff($expy)->i : '0'.$now->diff($expy)->i;
+                $data['userData']['time_left'] = $now->diff($expy)->h.":".$min_left;
+            }
+//dd($assessment_status, 'duderz');
             // check if the installer was downloaded and we'll assume it was installed
             $data['userData']['sourceInstalled'] = $user_aggy->hasDownloadedInstaller();
         }

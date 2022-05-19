@@ -17,6 +17,7 @@ Route::group([
 ], function () { // custom admin routes
     Route::post('edit-account-info/access-token', 'Users\Auth\AccessToken')->name('backpack.account.access-token');
     Route::post('assets/download-installer', 'Assets\DownloadInstallerAction')->name('download-installer');
+    Route::get('assets/download-installer', 'Assets\DownloadInstallerAction')->name('download-installer');
 
     Route::post('assets/quizzes/{quiz_id}/questions', 'Assets\Tests\CreateNewQuizQuestion');
     Route::delete('assets/quizzes/{quiz_id}/questions', 'Assets\Tests\DeactivateQuizQuestion');

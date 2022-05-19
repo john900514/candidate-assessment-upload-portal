@@ -105,6 +105,8 @@ class CandidateProfilePartial extends AggregatePartial
 
                     case 'Started':
                         $this->application_statuses[$job_id]['assessments'][$assessment]['badge'] = 'badge-info';
+                        $this->application_statuses[$job_id]['assessments'][$assessment]['time_started'] = $event->createdAt();
+                        $this->application_statuses[$job_id]['assessments'][$assessment]['time_expires'] = date('Y-m-d H:i:s', strtotime($event->createdAt()." + 4HOUR"));
                         break;
 
                     case 'Complete':
@@ -373,10 +375,71 @@ class CandidateProfilePartial extends AggregatePartial
                 if(array_key_exists($assessment_id, $this->application_statuses[$job_id]['assessments']))
                 {
                     $results = $this->application_statuses[$job_id]['assessments'][$assessment_id];
+
+                    // Eval the requirements progress
+                    // First check Tasks
+                    $tasks_completed = false;
+                    $quizzes_completed = false;
+                    $source_uploaded = $results['sourceUploaded'] ?? true;
+
+                    $requires_tasks = ($results['tasksReqd'] === true) || ($results['tasksReqd'] > 0);
+                    $requires_quizzes = ($results['quizzesReqd'] === true) || ($results['quizzesReqd'] > 0);
+
+                    if($requires_tasks)
+                    {
+                        if(array_key_exists('task_statuses', $results))
+                        {
+                            $col_res = collect($results['task_statuses']);
+                            $no_of_tasks_reqd = $col_res->where('required', '=', true)->count();
+                            $no_of_tasks_completed = $col_res->where('status', '=', 'Complete')->count();
+                            $tasks_completed = $results['tasksCompleted'] = $no_of_tasks_reqd == $no_of_tasks_completed;
+                            $results['tasksRemaining'] = $no_of_tasks_reqd - $no_of_tasks_completed;
+                        }
+                    }
+                    else
+                    {
+                        $tasks_completed = true;
+                    }
+
+                    if($requires_quizzes)
+                    {
+                        dd($results, 'farkity');
+                    }
+                    else
+                    {
+                        $quizzes_completed = true;
+                    }
+
+                    $assessment_complete = ($tasks_completed && $source_uploaded) && $quizzes_completed;
+
+                    if($assessment_complete)
+                    {
+                        $results['status'] = 'Complete';
+                        $results['badge'] = 'badge-success';
+                    }
                 }
                 else
                 {
                     $results = false;
+                }
+            }
+            else
+            {
+                $assessments_completed = 0;
+                $assessments_to_complete = count($results['assessments']);
+                foreach ($results['assessments'] as $ass_id => $user_data)
+                {
+                    $progress = $this->getAssessmentStatus($job_id, $ass_id);
+                    if(($progress['status'] == 'Completed') || ($progress['status'] == 'Complete'))
+                    {
+                        $assessments_completed++;
+                        $results['assessments'][$ass_id] = $progress;
+                    }
+                }
+
+                if($assessments_to_complete == $assessments_completed)
+                {
+                    $results['status'] = 'Ready to Apply';
                 }
             }
         }

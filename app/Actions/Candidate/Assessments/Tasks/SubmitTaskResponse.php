@@ -3,6 +3,7 @@
 namespace App\Actions\Candidate\Assessments\Tasks;
 
 use App\Aggregates\Users\UserAggregate;
+use Carbon\Carbon;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class SubmitTaskResponse
@@ -58,6 +59,15 @@ class SubmitTaskResponse
             {
                 if($assessment_status = $user_aggy->getAssessmentStatus($job_id, $assessment_id))
                 {
+                    $assessment_status['time_left'] = '4:00';
+                    if(array_key_exists('time_expires', $assessment_status))
+                    {
+                        $now = Carbon::parse(date('Y-m-d H:i:s'));
+                        $expy = Carbon::parse(date($assessment_status['time_expires']));
+                        $min_left = $now->diff($expy)->i > 9 ? $now->diff($expy)->i : '0'.$now->diff($expy)->i;
+                        $assessment_status['time_left'] = $now->diff($expy)->h.":".$min_left;
+                    }
+
                     $results = [
                         'userData' => $assessment_status ?? []
                     ];

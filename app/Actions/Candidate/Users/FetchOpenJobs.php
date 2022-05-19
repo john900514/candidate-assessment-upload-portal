@@ -49,11 +49,12 @@ class FetchOpenJobs
                                 'source' => $ass_aggy->hasCodeWork() ? 'Yes' : 'No',
                             ];
 
-                            if($status == 'Completed') $completed_assessments[$assessment] = true;
+                            if(($status == 'Completed') || ($status == 'Complete')) $completed_assessments[$assessment] = true;
                         }
                     }
                     $badge = 'badge-danger';
                     $job_again = $aggy->getAssessmentStatus($open_id);
+                    
                     switch($job_again['status'])
                     {
                         case 'Ready to Apply':

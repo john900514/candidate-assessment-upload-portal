@@ -23,6 +23,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="stat-value">{{ timeLeft }}</div>
                             <div class="stat-title">Time Remaining</div>
                             <div class="stat-desc text-secondary">To Complete assessment</div>
@@ -69,7 +70,7 @@
                             <div class="stat-value"> {{ udata.sourceInstalled ? '' : 'Not '}} Installed</div>
                             <div class="stat-desc" v-if="!udata.sourceInstalled">Source Code Available!</div>
                             <div class="stat-title truncate">{{ assessment.source.source['file_nickname']}}</div>
-                            <div class="stat-desc text-secondary" v-if="!udata.sourceInstalled">Download the Installer</div>
+                            <div class="stat-desc text-secondary cursor-pointer" v-if="!udata.sourceInstalled" @click="postInstaller()">Download the Installer</div>
                         </div>
 
                         <div class="stat extra-w">
@@ -97,10 +98,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="stat-value">Not Installed</div>
-                            <div class="stat-desc">Source Code Available!</div>
+                            <div class="stat-value"> {{ udata.sourceInstalled ? '' : 'Not '}} Installed</div>
+                            <div class="stat-desc" v-if="!udata.sourceInstalled">Source Code Available!</div>
                             <div class="stat-title truncate">{{ assessment.source.source['file_nickname']}}</div>
-                            <div class="stat-desc text-secondary">Download the Installer</div>
+                            <div class="stat-desc text-secondary cursor-pointer" v-if="!udata.sourceInstalled" @click="postInstaller()">Download the Installer</div>
                         </div>
                     </div>
                 </div>
@@ -202,6 +203,10 @@ export default {
     computed: {
         timeLeft() {
             let r = '4:00'
+
+            if('time_left' in this.udata) {
+                r = this.udata['time_left'];
+            }
 
             return r;
         },
@@ -328,7 +333,7 @@ export default {
 
         },
         badgeText(taskName) {
-            let r = 'Fuck You';
+            let r = '';
 
             if(this.udata) {
                 if(taskName in this.udata['task_statuses']) {
@@ -350,6 +355,13 @@ export default {
             return r;
             //return udata['task_statuses'][this.active_task.taskName]['status']
         },
+        postInstaller() {
+            window.location.href = '/portal/assets/download-installer';
+            setTimeout(() => {
+                Inertia.reload();
+            }, 1500)
+
+        }
     },
     mounted() {
         this.udata = this.userData;
