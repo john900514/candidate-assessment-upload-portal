@@ -113,7 +113,10 @@ class JobPositionAggregate extends AggregateRoot
 
     public function applyUserSubmittedJobApplication(UserSubmittedJobApplication $event)
     {
-        $this->candidate_users[$event->user_id] = $event->email;
+        $this->candidate_users[$event->user_id] = [
+            'email' => $event->email,
+            'date' => $event->createdAt()
+        ];
     }
 
     public function applyUsersJobApplicationWasReverted(UsersJobApplicationWasReverted $event)

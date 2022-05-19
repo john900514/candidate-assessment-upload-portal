@@ -176,6 +176,7 @@ class CandidateProfilePartial extends AggregatePartial
     public function applyCandidateAssessmentTaskStatusUpdated(CandidateAssessmentTaskStatusUpdated $event)
     {
         $this->application_statuses[$event->job_id]['assessments'][$event->assessment_id]['task_statuses'][$event->task_name] = $event->details;
+        $this->application_statuses[$event->job_id] = $this->getAssessmentStatus($event->job_id);
     }
 
     public function applyApplicantLinkedToJobPosition(ApplicantLinkedToJobPosition $event)
@@ -252,8 +253,18 @@ class CandidateProfilePartial extends AggregatePartial
 
     public function applyApplicantSubmittedJobApplication(ApplicantSubmittedJobApplication $event)
     {
-        $this->application_statuses[$event->job_id]['status'] = 'Applied';
-        $this->applied_for_job_positions[$event->job_id] = $this->application_statuses[$event->job_id];
+        $status = $this->getAssessmentStatus($event->job_id);
+        $status['status'] = 'Applied';
+        $this->applied_for_job_positions[$event->job_id] = $this->application_statuses[$event->job_id] = $status;
+
+        foreach ($this->open_job_positions as $idx => $job_id)
+        {
+            if($job_id == $event->job_id)
+            {
+                unset($this->open_job_positions[$idx]);
+                break;
+            }
+        }
     }
 
     public function updateCandidateRole(string $role) : self
@@ -292,7 +303,7 @@ class CandidateProfilePartial extends AggregatePartial
         $task_statuses = $assessment_status['task_statuses'];
         $task = $task_statuses[$task_name];
 
-        if($task['status'] == 'Complete')
+        if(($task['status'] == 'Completed') || ($task['status'] == 'Complete'))
         {
             // @todo - throw error
             return $this;
