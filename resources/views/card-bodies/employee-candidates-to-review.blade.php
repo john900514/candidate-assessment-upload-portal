@@ -3,6 +3,7 @@
     <tr>
         <th class="text-center">Candidate</th>
         <th>Job Position</th>
+        <th>Apply Date</th>
         <th class="text-center">Actions</th>
     </tr>
     </thead>
@@ -11,13 +12,17 @@
         @foreach($candidates as $candidate)
             <tr>
                 <td class="text-center">
-                    <div class="avatar"><img class="img-avatar" src="img/avatars/1.jpg" alt="admin@bootstrapmaster.com"><span class="avatar-status badge-success"></span></div>
+                    <div class="small text-muted"><span>{!! $candidate['user']['first_name'] !!} {!! $candidate['user']['last_name'] !!}</span></div>
                 </td>
                 <td>
-                    <div>Yiorgos Avraamu</div>
-                    <div class="small text-muted"><span>New</span> | Registered: Jan 1, 2015</div>
+                    <div></div>
+                    <div class="small text-muted"><span>{!! $candidate['position']['title'] !!}</span></div>
                 </td>
-                <td class="text-center"><i class="flag-icon flag-icon-us h4 mb-0" id="us" title="us"></i></td>
+                <td>
+                    <div></div>
+                    <div class="small text-muted">{!! $candidate['position']['date'] !!}</div>
+                </td>
+                <td class="text-center"><button type="button" class="btn btn-sm bg-info" onclick="window.location.href = '/portal/users/{!! $candidate['user']['id'] !!}/application?job={!! $candidate['position']['id'] !!}'">View</button></td>
             </tr>
         @endforeach
     @else

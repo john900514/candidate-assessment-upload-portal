@@ -2,6 +2,7 @@
 
 namespace App\Actions\Users\Dashboards;
 
+use App\Aggregates\Candidates\JobPositionAggregate;
 use App\Aggregates\Users\UserAggregate;
 use App\Models\User;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -15,6 +16,12 @@ class DeptHeadDashboard
         $my_aggy = backpack_user()->getAggregate();
         $users = User::all();
         $dept_users = [];
+        $applicant_users = [];
+
+        $dept_candidates_to_review = [
+            'candidates' => []
+        ];
+
         foreach($users as $idx => $user)
         {
             if($user_aggy = $user->getAggregate())
@@ -26,19 +33,51 @@ class DeptHeadDashboard
                         $dept_users[] = $user;
                     }
                 }
+                else
+                {
+                    $applicant_users[] = $user;
+                    if(count($submitted_apps = $user_aggy->getPositionsSubmitted()))
+                    {
+                        $dept_candidates_to_review['candidates'][$user->id] = [
+                            'user' => $user->toArray(),
+                            'position' => []
+                        ];
+
+                        foreach ($submitted_apps as $job_id => $assessment_details)
+                        {
+                            // Skip any records that aren't Applied status since they've been resolved
+                            if($assessment_details['status'] == 'Applied')
+                            {
+                                $job_aggy = JobPositionAggregate::retrieve($job_id);
+                                if(array_key_exists($user->id, $job_aggy->getPendingCandidates()))
+                                {
+                                    $tx = $job_aggy->getPendingCandidates()[$user->id]['date']->getTimestamp();
+                                    $dept_candidates_to_review['candidates'][$user->id]['position'] = [
+                                        'id' => $job_id,
+                                        'title' => $job_aggy->getJobTitle(),
+                                        'date' => date('Y-m-d H:i:s', $tx),
+                                    ];
+                                }
+
+                                break;
+                            }
+
+                        }
+                    }
+
+                    /**
+                     * STEPS
+                     * 1. Get the User's
+                     */
+                }
 
             }
         }
 
         /**
          * STEPS
-         * 1. Get Active Candidates
-         * 2. Get Amt of Candidates Applied
          * 3. Get #2 more data for table
          */
-        $dept_candidates_to_review = [
-            'candidates' => []
-        ];
 
         $employee_tickets = [];
         // @todo - change tickets table to empty
@@ -69,7 +108,7 @@ class DeptHeadDashboard
                         //'header' => 'Assigned to You', // optional
                         'body'   => '
                             <div class="h1 text-muted text-right mb-4"><i class="las la-user-tie"></i></div>
-                            <div class="text-value">0</div><small class="text-muted text-uppercase font-weight-bold">Active Candidates</small>
+                            <div class="text-value">'.count($applicant_users).'</div><small class="text-muted text-uppercase font-weight-bold">Active Candidates</small>
                             <div class="progress progress-white progress-xs mt-3">
                                 <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>',
@@ -84,7 +123,7 @@ class DeptHeadDashboard
                         //'header' => 'Messages', // optional
                         'body'   => '
                             <div class="h1 text-muted text-right mb-4"><i class="las la-user-tie"></i></div>
-                            <div class="text-value">0</div><small class="text-muted text-uppercase font-weight-bold">Active Applied</small>
+                            <div class="text-value">'.count($dept_candidates_to_review['candidates']).'</div><small class="text-muted text-uppercase font-weight-bold">Active Applied</small>
                             <div class="progress progress-white progress-xs mt-3">
                                 <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>',

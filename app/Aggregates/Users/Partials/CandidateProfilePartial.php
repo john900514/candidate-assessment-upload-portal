@@ -363,6 +363,11 @@ class CandidateProfilePartial extends AggregatePartial
         return  $this->open_job_positions;
     }
 
+    public function getPositionsSubmitted() : array
+    {
+        return $this->applied_for_job_positions;
+    }
+
     public function getCandidateStatus()
     {
         return $this->candidate_status;

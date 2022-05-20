@@ -263,9 +263,15 @@ class UserAggregate extends AggregateRoot
     {
         return $this->activity->hasDownloadedInstaller();
     }
+
     public function getAssessmentStatus(string $job_id, string|null $assessment_id = null) : false|array
     {
         return $this->candidate_profile->getAssessmentStatus($job_id, $assessment_id);
+    }
+
+    public function getPositionsSubmitted() : array
+    {
+        return $this->candidate_profile->getPositionsSubmitted();
     }
 
     public function getDepartment(): string|null

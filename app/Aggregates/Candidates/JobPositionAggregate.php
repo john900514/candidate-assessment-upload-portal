@@ -260,4 +260,9 @@ class JobPositionAggregate extends AggregateRoot
 
         return $results;
     }
+
+    public function getPendingCandidates() : array
+    {
+        return $this->candidate_users;
+    }
 }

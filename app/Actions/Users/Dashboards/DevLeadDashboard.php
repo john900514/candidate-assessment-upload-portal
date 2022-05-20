@@ -6,7 +6,7 @@ use App\Aggregates\Users\UserAggregate;
 use App\Models\User;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class DeptHeadDashboard
+class DevLeadDashboard
 {
     use AsAction;
 
