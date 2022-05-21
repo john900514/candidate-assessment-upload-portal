@@ -34,6 +34,7 @@ class FetchOpenJobs
                     foreach($assessments as $assessment)
                     {
                         $user_ass_status = $aggy->getAssessmentStatus($open_id, $assessment);
+
                         if($user_ass_status)
                         {
                             $ass_aggy = AssessmentAggregate::retrieve($assessment);
@@ -54,7 +55,7 @@ class FetchOpenJobs
                     }
                     $badge = 'badge-danger';
                     $job_again = $aggy->getAssessmentStatus($open_id);
-                    
+
                     switch($job_again['status'])
                     {
                         case 'Ready to Apply':

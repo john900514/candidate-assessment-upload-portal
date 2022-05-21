@@ -175,8 +175,8 @@ class CandidateProfilePartial extends AggregatePartial
 
     public function applyCandidateAssessmentTaskStatusUpdated(CandidateAssessmentTaskStatusUpdated $event)
     {
-        $this->application_statuses[$event->job_id]['assessments'][$event->assessment_id]['task_statuses'][$event->task_name] = $event->details;
         $this->application_statuses[$event->job_id] = $this->getAssessmentStatus($event->job_id);
+        $this->application_statuses[$event->job_id]['assessments'][$event->assessment_id]['task_statuses'][$event->task_name] = $event->details;
     }
 
     public function applyApplicantLinkedToJobPosition(ApplicantLinkedToJobPosition $event)
@@ -407,7 +407,7 @@ class CandidateProfilePartial extends AggregatePartial
                         {
                             $col_res = collect($results['task_statuses']);
                             $no_of_tasks_reqd = $col_res->where('required', '=', true)->count();
-                            $no_of_tasks_completed = $col_res->where('status', '=', 'Complete')->count();
+                            $no_of_tasks_completed = $col_res->where('status', '=', 'Complete')->where('required', '=', true)->count();
                             $tasks_completed = $results['tasksCompleted'] = $no_of_tasks_reqd == $no_of_tasks_completed;
                             $results['tasksRemaining'] = $no_of_tasks_reqd - $no_of_tasks_completed;
                         }

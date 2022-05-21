@@ -46,6 +46,8 @@ Route::group([
     'namespace'  => 'App\Http\Controllers',
 ], function () { // custom admin routes
     Route::get('dashboard', 'DashboardController@index')->name('backpack.dashboard');
+
+    Route::get('/users/{user_id}/application', 'Candidates\JobApplications\JobApplicationsViewerController@show')->name('candidates.job-applications');
     Route::get('assessments', 'Candidates\Assessments\AssessmentViewerController@index')->name('assessments.dashboard');
     Route::get('/assessments/{id}', 'Candidates\Assessments\AssessmentViewerController@show')->name('assessments.view-assessment');
     Route::get('edit-account-info', 'UserAccountController@index')->name('backpack.account.info');

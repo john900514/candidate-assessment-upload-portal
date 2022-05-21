@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Candidates;
 
 use App\Aggregates\Candidates\JobPositionAggregate;
+use App\Enums\CompanyDepartmentsEnum;
 use App\Enums\JobTypeEnum;
 use App\Enums\SecurityGroupEnum;
 use App\Enums\UserRoleEnum;
@@ -84,11 +85,17 @@ class JobPositionCrudController extends CrudController
         $this->crud->field('concentration')->type('select_from_array')
             ->options($job_types)->wrapper(['class' => 'col-6']);
 
-        $this->crud->field('concentration')->type('select_from_array')
-            ->options($job_types)->wrapper(['class' => 'col-6']);
-
+        /*
         $this->crud->field('description')->type('textarea')
             ->value('');
+        */
+
+        $departments = [
+            'ENGINEERING' => 'Development'
+        ];
+        $this->crud->field('department')->type('select_from_array')
+            ->wrapper(['class' => 'col-sm-12 col-md-6'])
+            ->options($departments);
 
         $roles = [];
         foreach(collect(UserRoleEnum::cases()) as $enum)
@@ -97,7 +104,7 @@ class JobPositionCrudController extends CrudController
         }
         $this->crud->field('awarded_role')->attributes(['required' => 'required'])
             ->type('select_from_array')->options($roles)
-            ->wrapper(['class' => 'col-12']);
+            ->wrapper(['class' => 'col-sm-12 col-md-6']);
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
@@ -115,6 +122,7 @@ class JobPositionCrudController extends CrudController
             'position' => $data['job_title'],
             'concentration' => $data['concentration'],
             'awarded_role' => $data['awarded_role'],
+            'department' => ['value' => $data['department']],
         ];
 
         switch($data['concentration'])
