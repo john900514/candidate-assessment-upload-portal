@@ -31,12 +31,12 @@ class TriggerUserUploadedSourceCode
             if($aggy->getCandidateStatus() == 'qualified-candidate')
             {
                 // user activity to log in uploaded_files, and user_file_uploads
-                $file_path = "/candidate_assessments/users/{$user_id}/";
+                $file_path = "/candidate_assessment/users/{$user_id}/source_codes/";
                 $exists_already = UploadedFile::whereFilePath($file_path.$assessment_id.'.zip')->first();
                 $madeup_file_upload_id = (!is_null($exists_already)) ? $exists_already->id : Uuid::uuid4()->toString();
                 $file_uploaded_date = date('Y-m-d H:i:s');
 
-                $aggy = $aggy->submitSourceCodeUpload($madeup_file_upload_id, $file_uploaded_date, $file_path, $assessment_id);
+                $aggy = $aggy->submitSourceCodeUpload($madeup_file_upload_id, $file_uploaded_date, $file_path.$assessment_id.'.zip', $assessment_id);
 
                 // Get Open Job Positions or fail with string
                 $jobs = $aggy->getOpenJobPositions();

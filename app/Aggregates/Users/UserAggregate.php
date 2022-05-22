@@ -7,6 +7,7 @@ use App\Aggregates\Users\Partials\CandidateProfilePartial;
 use App\Aggregates\Users\Partials\EmployeeProfilePartial;
 use App\Aggregates\Users\Partials\UserActivityPartial;
 use App\Exceptions\Users\UserAuthException;
+use App\Models\User;
 use App\StorableEvents\Users\Activity\Account\PasswordUpdated;
 use App\StorableEvents\Users\Activity\Account\UserVerified;
 use App\StorableEvents\Users\Activity\Email\UserSentWelcomeEmail;
@@ -254,9 +255,21 @@ class UserAggregate extends AggregateRoot
         return $this->verified;
     }
 
+    public function getVerificationDate(): null|string
+    {
+        $model = User::find($this->uuid());
+
+        return $model->email_verified_at;
+    }
+
     public function hasSubmittedResume() : bool
     {
         return $this->candidate_profile->hasSubmittedResume();
+    }
+
+    public function getResumePath() : null|string
+    {
+        return $this->candidate_profile->getResumePath();
     }
 
     public function hasDownloadedInstaller() : bool

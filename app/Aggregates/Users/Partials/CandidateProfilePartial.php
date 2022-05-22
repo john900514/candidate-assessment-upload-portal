@@ -168,6 +168,7 @@ class CandidateProfilePartial extends AggregatePartial
 
                 }
 
+                $this->application_statuses[$job_id]['last_updated'] = $event->createdAt();
                 //if($total_asses == $total_completed) $this->application_statuses[$job_id]['status'] = 'Ready to Apply';
             }
         }
@@ -177,6 +178,8 @@ class CandidateProfilePartial extends AggregatePartial
     {
         $this->application_statuses[$event->job_id] = $this->getAssessmentStatus($event->job_id);
         $this->application_statuses[$event->job_id]['assessments'][$event->assessment_id]['task_statuses'][$event->task_name] = $event->details;
+        $this->application_statuses[$event->job_id]['assessments'][$event->assessment_id]['last_updated'] = $event->createdAt();
+        $this->application_statuses[$event->job_id]['last_updated'] = $event->createdAt();
     }
 
     public function applyApplicantLinkedToJobPosition(ApplicantLinkedToJobPosition $event)
@@ -189,7 +192,8 @@ class CandidateProfilePartial extends AggregatePartial
             {
                 $this->application_statuses[$job_id] = [
                     'assessments' => [],
-                    'status' => 'Not Applied'
+                    'status' => 'Not Applied',
+                    'last_updated' => $event->createdAt()
                 ];
                 $job_aggy = JobPositionAggregate::retrieve($job_id);
                 $assessments = $job_aggy->getAssessments();
@@ -376,6 +380,11 @@ class CandidateProfilePartial extends AggregatePartial
     public function hasSubmittedResume() : bool
     {
         return $this->has_submitted_resume;
+    }
+
+    public function getResumePath() : null|string
+    {
+        return $this->resume_path;
     }
 
     public function getAssessmentStatus(string $job_id, string|null $assessment_id = null) : false|array
