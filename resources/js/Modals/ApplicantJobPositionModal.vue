@@ -42,7 +42,7 @@
 
             <div class="card bg-blue col-sm-12 col-md-12">
                 <div class="card-body text-center row" id="controlPanel">
-                    <button type="button" class="btn btn-outline-success" :disabled="!readyToApply" @click="submitApplication()" v-if="position.status !== 'Applied'">{{ applyBtnText }}</button>
+                    <button type="button" class="btn" :class="applyBtnClass" :disabled="!readyToApply" @click="submitApplication()" v-if="position.status !== 'Applied'">{{ applyBtnText }}</button>
                     <button type="button" class="btn btn-danger" @click="closeModal()"> Close Modal </button>
                 </div>
             </div>
@@ -69,8 +69,13 @@ export default {
                 ? 'Apply For Job'
                 : 'Requirements not Completed'
         },
+        applyBtnClass() {
+            return this.readyToApply
+                ? 'btn-success'
+                : 'btn-outline-success'
+
+        },
         readyToApply() {
-            console.log('Holy fucking shit', this.position);
             return this.position.status === 'Ready to Apply';
         },
         assessmentData() {
