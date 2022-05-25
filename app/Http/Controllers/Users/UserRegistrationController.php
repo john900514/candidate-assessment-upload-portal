@@ -141,4 +141,45 @@ class UserRegistrationController extends Controller
 
         return response($results, $code);
     }
+
+    public function verify_employee()
+    {
+        $user = backpack_user();
+        $aggy = UserAggregate::retrieve($user->id);
+
+        if($aggy->isEmployee() && (is_null($aggy->getVerificationDate())))
+        {
+            $data = [
+                'userId' => $user->id,
+                'user' => $user->toArray()
+            ];
+            return Inertia::render('Employees/Registration/VerifyAccount', $data);
+        }
+        else
+        {
+            throw UserAuthException::accessDenied();
+        }
+    }
+
+    public function update_password_and_verify_employee()
+    {
+        $results = 'Bad Request';
+        $code = 500;
+
+        try {
+            UserAggregate::retrieve(request()->get('id'))
+                ->updatePassword(bcrypt(request()->get('password')))
+                ->verifyUser(date('Y-m-d H:i:s'))
+                ->persist();
+
+            $results = true;
+            $code = 200;
+        }
+        catch(\Exception $e)
+        {
+            $results = $e->getMessage();
+        }
+
+        return response($results, $code);
+    }
 }

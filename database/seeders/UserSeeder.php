@@ -90,10 +90,12 @@ class UserSeeder extends Seeder
             $aggy = UserAggregate::retrieve(Uuid::uuid4()->toString())
                 ->createUser($dev, $role);
 
+            /* Uncomment if dev on local.
             if($role != 'applicant')
             {
                 $aggy = $aggy->verifyUser(date('Y-m-d H:i:s'));
             }
+            */
 
             $aggy->persist();
         }

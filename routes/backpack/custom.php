@@ -53,6 +53,8 @@ Route::group([
     Route::get('edit-account-info', 'UserAccountController@index')->name('backpack.account.info');
     Route::get('/registration/upload-resume', 'Users\UserRegistrationController@show_resume_uploader')->name('candidates.resume-uploader');
     Route::post('/registration/upload-resume', 'Users\UserRegistrationController@upload_resume')->name('candidates.upload-resume');
+    Route::get('/registration/verify-employee', 'Users\UserRegistrationController@verify_employee')->name('employees.verify-page');
+    Route::post('/registration/verify-employee', 'Users\UserRegistrationController@update_password_and_verify_employee')->name('employees.verify');
 });
 
 Route::group([

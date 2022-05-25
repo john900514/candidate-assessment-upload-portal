@@ -101,43 +101,50 @@ class DashboardController extends Controller
         }
         else
         {
-            $role = $aggy->getRole();
-
-            switch($role)
+            if(!is_null($aggy->getVerificationDate()))
             {
-                case 'dept_head':
-                    switch($aggy->getDepartment())
-                    {
-                        case 'ENGINEERING':
-                            $this->data['widgets']['before_content'] = [DeptHeadDashboard::run()];
-                            break;
+                $role = $aggy->getRole();
 
-                        case 'HR':
-                            $this->data['widgets']['before_content'] = [HRDashboard::run()];
-                            break;
+                switch($role)
+                {
+                    case 'dept_head':
+                        switch($aggy->getDepartment())
+                        {
+                            case 'ENGINEERING':
+                                $this->data['widgets']['before_content'] = [DeptHeadDashboard::run()];
+                                break;
 
-                    }
-                    break;
+                            case 'HR':
+                                $this->data['widgets']['before_content'] = [HRDashboard::run()];
+                                break;
 
-                case 'dev_lead':
-                    $this->data['widgets']['before_content'] = [DevLeadDashboard::run()];
-                    break;
+                        }
+                        break;
 
-                default:
-                    // The default Empty State
-                    $this->data['widgets'] = [
-                        'before_content' => [
-                            [
-                                'type'        => 'jumbotron',
-                                'heading'     => 'Hi!',
-                                'content'     => "There's nothing here for you right now. Come back later!",
-                                'button_link' => backpack_url('logout'),
-                                'button_text' => 'Ok Bye.',
+                    case 'dev_lead':
+                        $this->data['widgets']['before_content'] = [DevLeadDashboard::run()];
+                        break;
+
+                    default:
+                        // The default Empty State
+                        $this->data['widgets'] = [
+                            'before_content' => [
+                                [
+                                    'type'        => 'jumbotron',
+                                    'heading'     => 'Hi!',
+                                    'content'     => "There's nothing here for you right now. Come back later!",
+                                    'button_link' => backpack_url('logout'),
+                                    'button_text' => 'Ok Bye.',
+                                ]
                             ]
-                        ]
-                    ];
+                        ];
+                }
             }
-
+            else
+            {
+                // otherwise, redirect to the password create page.
+                return redirect('/portal/registration/verify-employee');
+            }
         }
 
         return view(backpack_view('dashboard'), $this->data);
