@@ -124,7 +124,12 @@ class UserManagementCrudController extends CrudController
 
         CRUD::column('email_verified_at')->label('Active')->type('boolean');
 
+        if($user->can('view_candidates'))
+        {
+            $this->crud->addButtonFromView('line','Impersonate','impersonate-user', 'beginning');
+        }
         $this->crud->addButtonFromView('line','Resend Email','resend-welcome-email', 'beginning');
+
         $this->crud->enableResponsiveTable();
     }
 

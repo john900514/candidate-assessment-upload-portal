@@ -7,6 +7,12 @@
     <a class="nav-link" href="{{ backpack_url('dashboard') }}"><i class="la la-home nav-icon"></i> {{ trans('backpack::base.dashboard') }}</a>
 </li>
 
+@if(session()->has('impersonation-mode')))
+<li class="nav-item">
+    <a class="nav-link" href="{{ backpack_url() }}/impersonation/clear"><i class="las la-user-ninja nav-icon"></i> Stop Impersonating </a>
+</li>
+@endif
+
 @if($user->can('view_employees') || backpack_user()->can('view_candidates'))
     <li class="nav-item">
         <a class="nav-link" href="{{ backpack_url('users') }}"><i class="las la-user-ninja nav-icon"></i> Users </a>

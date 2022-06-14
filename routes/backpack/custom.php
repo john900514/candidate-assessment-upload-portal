@@ -35,6 +35,9 @@ Route::group([
     Route::get('assessments/quizzes', 'Candidate\Assessments\Quizzes\GetAvailableQuizzesForAssessment');
     Route::post('assessments/quizzes', 'Candidate\Assessments\Quizzes\AddQuizToAssessment');
     Route::delete('assessments/quizzes', 'Candidate\Assessments\Quizzes\DeactivateQuizFromAssessment');
+
+    Route::post('/users/{userId}/impersonate', \App\Actions\Impersonation\ImpersonateUser::class)->name('impersonation.start');
+    Route::get('/impersonation/clear', \App\Actions\Impersonation\StopImpersonatingUser::class)->name('impersonation.stop');
 });
 
 Route::group([
