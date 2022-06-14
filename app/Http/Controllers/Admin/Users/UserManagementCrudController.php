@@ -8,8 +8,10 @@ use App\Actions\Users\Query\GetAllUserUUIDs;
 use App\Aggregates\Users\UserAggregate;
 use App\Http\Requests\Users\UserManagementRequest;
 use App\Models\Candidates\JobPosition;
+use App\Traits\CRUDFilters\Users\EmployeeCandidateFilter;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -24,6 +26,8 @@ class UserManagementCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation  { update as traitUpdate; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+
+    use EmployeeCandidateFilter;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -48,8 +52,39 @@ class UserManagementCrudController extends CrudController
         $user = backpack_user();
         if($user->can('view_employees') && $user->can('view_candidates'))
         {
-            $user_uuids = GetAllUserUUIDs::run();
-            $this->crud->addClause('whereIn', 'id', $user_uuids);
+            if(!request()->has('employee-status'))
+            {
+                $this->addCandidatesButton();
+                $this->addEmployeesButton();
+                $user_uuids = GetAllUserUUIDs::run();
+                $this->crud->addClause('whereIn', 'users.id', $user_uuids);
+            }
+            else
+            {
+                switch(request()->get('employee-status'))
+                {
+                    case 1:
+                        $this->addCandidatesButton();
+                        $this->addClearButton();
+                        $user_uuids = GetAllEmployeeUUIDs::run();
+                        $this->crud->addClause('whereIn', 'id', $user_uuids);
+                        break;
+
+                    case 2:
+                        $this->addEmployeesButton();
+                        $this->addClearButton();
+                        $user_uuids = GetAllCandidateUUIDs::run();
+                        $this->crud->addClause('whereIn', 'id', $user_uuids);
+                        break;
+
+                        default:
+                            $this->addEmployeesButton();
+                        $this->addCandidatesButton();
+                        $user_uuids = GetAllUserUUIDs::run();
+                        $this->crud->addClause('whereIn', 'users.id', $user_uuids);
+                }
+            }
+
         }
         else if($user->can('view_employees'))
         {
@@ -89,11 +124,6 @@ class UserManagementCrudController extends CrudController
 
         CRUD::column('email_verified_at')->label('Active')->type('boolean');
 
-        /**
-         * Columns can be defined using the fluent syntax or array syntax:
-         * - CRUD::column('price')->type('number');
-         * - CRUD::addColumn(['name' => 'price', 'type' => 'number']);
-         */
         $this->crud->addButtonFromView('line','Resend Email','resend-welcome-email', 'beginning');
         $this->crud->enableResponsiveTable();
     }

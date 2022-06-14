@@ -78,4 +78,19 @@ class User extends Authenticatable
     {
         return is_null($this->id) ? false : UserAggregate::retrieve($this->id);
     }
+
+    public function openCandidates($crud = false)
+    {
+        return '<button type="button" class="btn btn-danger" onclick="window.location.href = \''.backpack_url().'/users?employee-status=2\'" data-toggle="tooltip" title="Toggle the Employees Filter."><i class="las la-magic"></i> Candidates</a>';
+    }
+
+    public function openEmployees($crud = false)
+    {
+        return '<button type="button" class="btn btn-warning" onclick="window.location.href = \''.backpack_url().'/users?employee-status=1\'" data-toggle="tooltip" title="Toggle the Candidate Filter."><i class="las la-magic"></i> Employees</a>';
+    }
+
+    public function openClearFilter($crud = false)
+    {
+        return '<button type="button" class="btn btn-success" onclick="window.location.href = \''.backpack_url().'/users\'" data-toggle="tooltip" title="Toggle Clearing the Employee Status Filter."><i class="las la-magic"></i> Clear</a>';
+    }
 }
