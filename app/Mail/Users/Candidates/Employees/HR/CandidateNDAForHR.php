@@ -34,7 +34,7 @@ class CandidateNDAForHR extends Mailable
         return $this->from(
             env('MAIL_FROM_ADDRESS','developers@capeandbay.com'),
             env('MAIL_FROM_NAME', 'Cape & Bay Dev Team')
-        )->subject('Here is a copy of the non-disclosure agreement you signed!')
+        )->subject('A Hiring Candidate signed their NDA!')
             ->attachData($this->pdf->output(), "Candidate-{$first}{$last}NDA.pdf")
             ->view('emails.users.employees.hr.candidate-submitted-nda', $this->details);
     }
