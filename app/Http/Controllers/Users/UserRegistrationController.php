@@ -182,4 +182,37 @@ class UserRegistrationController extends Controller
 
         return response($results, $code);
     }
+
+    public function sign_nda()
+    {
+        $aggy = UserAggregate::retrieve(backpack_user()->id);
+
+        if($aggy->isApplicant())
+        {
+            if(!$aggy->hasSignedNDA())
+            {
+                $data = [
+                    'userId' => $aggy->uuid(),
+                    'date-blank'=> date('d F'),
+                    'year-blank' => date('Y'),
+                    'user' => [
+                        'firstName' => $aggy->getFirstName(),
+                        'lastName'  => $aggy->getLastName()
+                    ]
+
+                ];
+                return Inertia::render('Candidates/Registration/SignNda', $data);
+            }
+            else
+            {
+                return redirect('/portal/registration/upload-resume');
+            }
+        }
+        else
+        {
+            backpack_auth()->logout();
+            \Alert::add('info', 'This is for applicants.')->flash();
+            return redirect(backpack_url('dashboard'));
+        }
+    }
 }

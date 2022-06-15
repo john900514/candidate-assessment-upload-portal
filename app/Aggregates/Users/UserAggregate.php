@@ -206,6 +206,12 @@ class UserAggregate extends AggregateRoot
         return $this;
     }
 
+    public function submitNDA(array $details) : self
+    {
+        $this->candidate_profile->submitNDA($details);
+        return $this;
+    }
+
     public function getAccessToken() : string | false
     {
         return $this->access_token->getAccessToken();
@@ -260,6 +266,11 @@ class UserAggregate extends AggregateRoot
         $model = User::find($this->uuid());
 
         return $model->email_verified_at;
+    }
+
+    public function hasSignedNDA() : bool
+    {
+        return $this->candidate_profile->hasSignedNDA();
     }
 
     public function hasSubmittedResume() : bool

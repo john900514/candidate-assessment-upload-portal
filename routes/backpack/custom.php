@@ -26,6 +26,8 @@ Route::group([
     Route::get('candidates/user-open-jobs', 'Candidate\Users\FetchOpenJobs');
     Route::post('candidates/submit-application', 'Candidate\Jobs\SubmitJobApplication');
 
+    Route::post('/registration/sign-nda', \App\Actions\Candidate\Users\SubmitNDA::class)->name('candidates.resume-uploader');
+
     Route::post('assessments/tasks', 'Candidate\Assessments\Tasks\CreateNewTask');
     //Route::put('assessments/tasks', 'Candidate\Assessments\Tasks\ReactivateTask');
     Route::delete('assessments/tasks', 'Candidate\Assessments\Tasks\DeactivateTask');
@@ -54,6 +56,8 @@ Route::group([
     Route::get('assessments', 'Candidates\Assessments\AssessmentViewerController@index')->name('assessments.dashboard');
     Route::get('/assessments/{id}', 'Candidates\Assessments\AssessmentViewerController@show')->name('assessments.view-assessment');
     Route::get('edit-account-info', 'UserAccountController@index')->name('backpack.account.info');
+    Route::get('/registration/sign-nda', 'Users\UserRegistrationController@sign_nda')->name('candidates.resume-uploader');
+
     Route::get('/registration/upload-resume', 'Users\UserRegistrationController@show_resume_uploader')->name('candidates.resume-uploader');
     Route::post('/registration/upload-resume', 'Users\UserRegistrationController@upload_resume')->name('candidates.upload-resume');
     Route::get('/registration/verify-employee', 'Users\UserRegistrationController@verify_employee')->name('employees.verify-page');

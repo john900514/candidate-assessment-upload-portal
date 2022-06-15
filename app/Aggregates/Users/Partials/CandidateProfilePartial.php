@@ -8,6 +8,7 @@ use App\Exceptions\Candidates\JobPositionException;
 use App\StorableEvents\Candidates\Assessments\CandidateAssessmentTaskStatusUpdated;
 use App\StorableEvents\Candidates\Assessments\CandidateJobAssessmentStatusUpdated;
 use App\StorableEvents\Candidates\Assessments\SourceCodeSubmittedForAssessment;
+use App\StorableEvents\Candidates\Registration\NDASubmitted;
 use App\StorableEvents\Users\ApplicantCreated;
 use App\StorableEvents\Users\Applicants\ApplicantLinkedToJobPosition;
 use App\StorableEvents\Users\Applicants\ApplicantRoleChanged;
@@ -24,6 +25,7 @@ class CandidateProfilePartial extends AggregatePartial
 
     protected array $application_statuses = [];
     protected bool $has_submitted_resume = false;
+    protected bool $has_signed_nda = false;
     protected string|null $resume_path = null;
 
     public function applyUserCreated(UserCreated $event)
@@ -271,6 +273,11 @@ class CandidateProfilePartial extends AggregatePartial
         }
     }
 
+    public function applyNDASubmitted(NDASubmitted $event)
+    {
+        $this->has_signed_nda = true;
+    }
+
     public function updateCandidateRole(string $role) : self
     {
         $this->recordThat(new ApplicantRoleChanged($this->aggregateRootUuid(), $role));
@@ -362,6 +369,12 @@ class CandidateProfilePartial extends AggregatePartial
         return $this;
     }
 
+    public function submitNDA(array $details) : self
+    {
+        $this->recordThat(new NDASubmitted($this->aggregateRootUuid(), $details));
+        return $this;
+    }
+
     public function getOpenJobPositions() : array
     {
         return  $this->open_job_positions;
@@ -375,6 +388,11 @@ class CandidateProfilePartial extends AggregatePartial
     public function getCandidateStatus()
     {
         return $this->candidate_status;
+    }
+
+    public function hasSignedNDA() : bool
+    {
+        return $this->has_signed_nda;
     }
 
     public function hasSubmittedResume() : bool

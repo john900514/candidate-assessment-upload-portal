@@ -14,6 +14,7 @@ use App\StorableEvents\Candidates\JobDescription;
 use App\StorableEvents\Candidates\JobPositionCreated;
 use App\StorableEvents\Candidates\JobPositionUpdated;
 use App\StorableEvents\Candidates\QualifiedRoleAdded;
+use App\StorableEvents\Candidates\Registration\NDASubmitted;
 use Spatie\EventSourcing\EventHandlers\Projectors\Projector;
 
 class CandidateProjector extends Projector
@@ -80,6 +81,17 @@ class CandidateProjector extends Projector
             'file_id' => $event->file_id,
             'file_nickname' => "Assessment {$event->assessment_id}",
             'description' => 'User submitted source code for assessment on '.$event->date
+        ]);
+    }
+
+    public function onNDASubmitted(NDASubmitted $event)
+    {
+        UserDetails::firstOrCreate([
+            'user_id' => $event->user_id,
+            'name' => 'submitted-nda',
+            'value' => $event->details['date']['date'],
+            'misc' => $event->details,
+            'active' => 1
         ]);
     }
 }

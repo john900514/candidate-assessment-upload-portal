@@ -35,69 +35,78 @@ class DashboardController extends Controller
         if($aggy->isApplicant())
         {
             // @todo - adjust applicants
-            if($aggy->hasSubmittedResume())
+            if($aggy->hasSignedNDA())
             {
-                $todo_list_data = GetToDoList::run(backpack_user()->id);
-                $dashboard_content = [];
-                $dashboard_content[] = [
-                    'type'        => 'card',
-                    'content' => [
-                        'body' => 'Welcome to the Cape & Bay Hiring Portal! Below is your dashboard. It contains your todo list and the available job positions(s) you have been invited to. Please follow the directions and complete all the requirements in order to Submit your application. You will have 4 hours to complete each assessment that is tied your selected job position. Please do not start an assessment unless you are ready to complete in one sitting.',
-                    ],
-                    'class' => 'bg-error text-white',
-                    'wrapper' => ['class' => 'col-md-12 pt-4']
-                ];
-
-                if($aggy->getDepartment() == 'ENGINEERING')
+                if($aggy->hasSubmittedResume())
                 {
+                    $todo_list_data = GetToDoList::run(backpack_user()->id);
+                    $dashboard_content = [];
                     $dashboard_content[] = [
                         'type'        => 'card',
                         'content' => [
-                            'header' => 'Download the Installer',
-                            'body' => view('card-bodies.download-the-installer')->render()
+                            'body' => 'Welcome to the Cape & Bay Hiring Portal! Below is your dashboard. It contains your todo list and the available job positions(s) you have been invited to. Please follow the directions and complete all the requirements in order to Submit your application. You will have 4 hours to complete each assessment that is tied your selected job position. Please do not start an assessment unless you are ready to complete in one sitting.',
                         ],
-                        'class' => 'bg-info',
-                        'wrapper' => ['class' => 'col-md-6 not-sm pt-4']
+                        'class' => 'bg-error text-white',
+                        'wrapper' => ['class' => 'col-md-12 pt-4']
+                    ];
+
+                    if($aggy->getDepartment() == 'ENGINEERING')
+                    {
+                        $dashboard_content[] = [
+                            'type'        => 'card',
+                            'content' => [
+                                'header' => 'Download the Installer',
+                                'body' => view('card-bodies.download-the-installer')->render()
+                            ],
+                            'class' => 'bg-info',
+                            'wrapper' => ['class' => 'col-md-6 not-sm pt-4']
+
+                        ];
+                    }
+
+                    $dashboard_content[] = [
+                        'type'        => 'card',
+                        'content' => [
+                            'header' => 'Your ToDo List',
+                            'body' => view('card-bodies.applicants-todo-list', ['list' => $todo_list_data])->render()
+                        ],
+                        'class' => 'bg-secondary',
+                        'wrapper' => ['class' => 'col-md-6 col-sm-12 pt-4']
 
                     ];
-                }
+                    $dashboard_content[] =  [
+                        'type'        => 'card',
+                        'content' => [
+                            'header' => $aggy->getFirstName()."'s Open Positions",
+                            'body' => view('card-bodies.applicants-open-positions')->render()
+                        ],
+                        'class' => 'bg-success',
+                        'wrapper' => ['class' => 'col-md-12 col-sm-12 pt-4']
 
-                $dashboard_content[] = [
-                    'type'        => 'card',
-                    'content' => [
-                        'header' => 'Your ToDo List',
-                        'body' => view('card-bodies.applicants-todo-list', ['list' => $todo_list_data])->render()
-                    ],
-                    'class' => 'bg-secondary',
-                    'wrapper' => ['class' => 'col-md-6 col-sm-12 pt-4']
+                    ];
 
-                ];
-                $dashboard_content[] =  [
-                    'type'        => 'card',
-                    'content' => [
-                        'header' => $aggy->getFirstName()."'s Open Positions",
-                        'body' => view('card-bodies.applicants-open-positions')->render()
-                    ],
-                    'class' => 'bg-success',
-                    'wrapper' => ['class' => 'col-md-12 col-sm-12 pt-4']
-
-                ];
-
-                $this->data['widgets'] = [
-                    'before_content' => [
-                        [
-                            'type'    => 'div',
-                            'class'   => 'row',
-                            'content' => $dashboard_content
+                    $this->data['widgets'] = [
+                        'before_content' => [
+                            [
+                                'type'    => 'div',
+                                'class'   => 'row',
+                                'content' => $dashboard_content
+                            ]
                         ]
-                    ]
-                ];
+                    ];
+                }
+                else
+                {
+                    // otherwise, redirect to the resume upload page.
+                    return redirect('/portal/registration/upload-resume');
+                }
             }
             else
             {
                 // otherwise, redirect to the resume upload page.
-                return redirect('/portal/registration/upload-resume');
+                return redirect('/portal/registration/sign-nda');
             }
+
         }
         else
         {
