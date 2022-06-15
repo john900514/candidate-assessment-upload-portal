@@ -11,6 +11,8 @@ class GenerateNdaPdf
 
     public function handle(array $details)
     {
-        return PDF::loadView('documents.candidate-nda', $details);
+        $pdf = PDF::loadView('documents.candidate-nda', $details);
+        $pdf->setOptions(['defaultFont' => 'arial']);
+        return $pdf;
     }
 }

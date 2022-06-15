@@ -122,7 +122,7 @@
                         <p style="text-indent: 0pt;text-align: left;"><br/></p>
                         <div style="padding-left: 221pt;text-indent: 0pt;text-align: left;">SIGN
                             <p class="s1 border-b border-b-4 border-black cursor-pointer  w-1/2" @click="showSign = 1" v-if="showSign === 0"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;Click to Sign&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </p>
-                            <div v-if="showSign === 1" class="border border-2 border-black w-1/2">
+                            <div v-if="showSign === 1" class="border border-2 border-black w-1/2 h-[100px]">
                                 <vue-signature-pad ref="signaturePad" />
                             </div>
                             <div v-if="showSign === 1">
