@@ -131,6 +131,7 @@ class DashboardController extends Controller
                         break;
 
                     case 'dev_lead':
+                    case 'senior_dev':
                         $this->data['widgets']['before_content'] = [DevLeadDashboard::run()];
                         break;
 

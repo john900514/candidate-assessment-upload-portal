@@ -64,11 +64,6 @@ class DeptHeadDashboard
 
                         }
                     }
-
-                    /**
-                     * STEPS
-                     * 1. Get the User's
-                     */
                 }
 
             }

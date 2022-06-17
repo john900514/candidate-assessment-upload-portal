@@ -18,7 +18,7 @@ class AbilitiesSeeder extends Seeder
         $abilities = [
             'user' => [
                 'view_employees'    => ['ADMIN', 'EXECUTIVE', 'PROJECT_MANAGER', 'DEPT_HEAD', 'DEV_LEAD', 'DEV', 'JUNIOR_DEV', 'HR'],
-                'view_candidates'   => ['ADMIN', 'EXECUTIVE', 'PROJECT_MANAGER', 'DEPT_HEAD', 'DEV_LEAD', 'HR'],
+                'view_candidates'   => ['ADMIN', 'EXECUTIVE', 'PROJECT_MANAGER', 'DEPT_HEAD', 'DEV_LEAD', 'SENIOR_DEV','HR'],
                 'create_employees'  => ['ADMIN', 'EXECUTIVE', 'PROJECT_MANAGER', 'DEPT_HEAD', 'HR'],
                 'create_candidates' => ['ADMIN', 'EXECUTIVE', 'PROJECT_MANAGER', 'DEPT_HEAD', 'DEV_LEAD', 'HR'],
                 'promote_candidates_to_employees' => ['EXECUTIVE', 'DEPT_HEAD'],
